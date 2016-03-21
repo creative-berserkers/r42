@@ -4,7 +4,7 @@ var webpack = require('webpack');
 module.exports = {
   devtool: 'source-map',
   entry: [
-    './src/index'
+    './src/components/index'
   ],
   output: {
     path: path.join(__dirname, 'dist'),
@@ -27,8 +27,12 @@ module.exports = {
   module: {
     loaders: [{
       test: /\.js$/,
-      loaders: ['babel'],
-      include: path.join(__dirname, 'src')
+      loader: 'babel',
+      include: path.join(__dirname, 'src/components'),
+      query: {
+        presets: ['es2015'],
+        plugins: [['transform-react-jsx', {pragma: 'element'}]]
+      }
     }]
   }
 };

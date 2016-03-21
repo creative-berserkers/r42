@@ -1,0 +1,47 @@
+{
+  "ecmaFeatures": {
+    "jsx": true,
+    "modules": true
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "parser": "babel-eslint",
+  "rules": {
+    "quotes": [2, "single"],
+    "strict": [2, "never"],
+    "semi": [2, "never"],
+    "babel/generator-star-spacing": 1,
+    "babel/new-cap": 1,
+    "babel/object-shorthand": 1,
+    "babel/arrow-parens": 1,
+    "babel/no-await-in-loop": 1,
+    "deku/display-name": 1,
+    "deku/jsx-boolean-value": 1,
+    "deku/jsx-curly-spacing": 1,
+    "deku/jsx-max-props-per-line": 1,
+    "deku/jsx-no-duplicate-props": 1,
+    "deku/jsx-no-undef": 1,
+    "deku/jsx-quotes": 1,
+    "deku/jsx-sort-prop-types": 1,
+    "deku/jsx-sort-props": 1,
+    "deku/jsx-uses-deku": 1,
+    "deku/jsx-uses-vars": 1,
+    "deku/no-danger": 1,
+    "deku/no-did-mount-set-state": 1,
+    "deku/no-did-update-set-state": 1,
+    "deku/no-multi-comp": 1,
+    "deku/no-unknown-property": 1,
+    "deku/prop-types": 1,
+    "deku/deku-in-jsx-scope": 1,
+    "deku/require-extension": 1,
+    "deku/self-closing-comp": 1,
+    "deku/sort-comp": 1,
+    "deku/wrap-multilines": 1
+  },
+  "plugins": [
+    "babel",
+    "deku"
+  ]
+}
