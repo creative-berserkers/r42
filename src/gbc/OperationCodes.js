@@ -124,3 +124,80 @@ export function RR_X(regX, memory){
   memory.setHalfCarryFlag(false)
   memory.setLastInstructionClock(1)
 }
+
+export function JR_NZ_r8(memory){
+  if (!memory.zeroFlag()) {
+    memory.setPC (memory.PC() + ((memory.readByte(memory.PC()) << 24) >> 24) + 1)
+    memory.setLastInstructionClock(3)
+  }
+  else {
+    memory.setPC(memory.PC() + 1)
+    memory.setLastInstructionClock(2)
+  }
+}
+
+export function LDI_XY_Z(regX, regY, regZ, memory){
+  const tmp = (memory.reg8(regX)<<8)+memory.reg8(regY)
+  memory.writeByte(tmp, memory.reg8(regZ))
+  const tmp2 = tmp + 1
+  memory.setReg8(regX, tmp2<<8)
+  memory.setReg8(regY, tmp2)
+  memory.setLastInstructionClock(2)
+}
+
+export function DAX(regX, memory){
+  if (!memory.subtractFlag()) {
+    //                                            10011001
+    if (memory.carryFlag() || memory.reg8(regX) > 0x99) {
+      //                                       1100000
+      memory.setReg8(regX, memory.reg8(regX) + 0x60)
+      memory.setCarryFlag(true)
+    }
+    //                                                  1111    1001
+    if (memory.halfCarryFlag() || ((memory.reg8(regX) & 0xF)) > 0x9) {
+      //                                       00000110
+      memory.setReg8(regX, memory.reg8(regX) + 0x06)
+      memory.setHalfCarryFlag(false)
+    }
+  }
+  else if (memory.carryFlag() && memory.halfCarryFlag()) {
+    //                                       10011010
+    memory.setReg8(regX, memory.reg8(regX) + 0x9A)
+    memory.setHalfCarryFlag(false)
+  }
+  else if (memory.carryFlag()) {
+    //                                         10100000
+    memory.setReg8(regX, (memory.reg8(regX)) + 0xA0)
+  }
+  else if (memory.halfCarryFlag()) {
+    //                                       11111010
+    memory.setReg8(regX, memory.reg8(regX) + 0xFA)
+    memory.setHalfCarryFlag(false)
+  }
+  memory.setZeroFlag(memory.reg8(regX) === 0)
+  memory.setLastInstructionClock(1)
+}
+
+export function JR_Z_r8(memory){
+  if (memory.zeroFlag()) {
+    memory.setPC(memory.PC() + ((memory.readByte(memory.PC()) << 24) >> 24) + 1)
+    memory.setLastInstructionClock(3)
+  }
+  else {
+    memory.setPC(memory.PC() + 1)
+    memory.setLastInstructionClock(2)
+  }
+}
+
+export function LDI_X_YZ(regX, regY, regZ, memory){
+  const tmp = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  memory.setReg8(regX, memory.readByte(tmp))
+  const tmp2 = tmp + 1
+  memory.setReg8(regY, tmp2<<8)
+  memory.setReg8(regZ, tmp2)
+  memory.setLastInstructionClock(2)
+}
+
+export function CPL(){
+  
+}

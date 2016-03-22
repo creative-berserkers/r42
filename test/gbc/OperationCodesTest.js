@@ -291,4 +291,118 @@ describe('Operation codes test', ()=>{
     })
     expectNumberOfCycle(1, memory)
   })
+
+  describe('JR_NZ_r8',()=>{
+    describe('with zero flag === false',()=>{
+      const memory = Memory.createEmptyMemory()
+      memory.setPC(0x0002)
+      memory.writeByte(0x0002,4)
+      memory.setZeroFlag(false)
+
+      it('should increase PC by memory[PC] when zero flag is set to false',()=>{
+        opcodes.JR_NZ_r8(memory)
+        expect(memory.PC()).to.equal(7)
+
+      })
+      expectNumberOfCycle(3,memory)
+    })
+
+    describe('with zero flag === true',()=>{
+      const memory = Memory.createEmptyMemory()
+      memory.setPC(0x0002)
+      memory.writeByte(0x0002,4)
+      memory.setZeroFlag(true)
+
+      it('should increase PC by memory[PC] when zero flag is set to true',()=>{
+        opcodes.JR_NZ_r8(memory)
+        expect(memory.PC()).to.equal(3)
+      })
+      expectNumberOfCycle(2,memory)
+    })
+  })
+
+  describe('LDI_XY_Z',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A,45)
+    memory.setReg8(reg8.H,0)
+    memory.setReg8(reg8.L,1)
+    memory.writeByte(0x0001,0)
+
+    opcodes.LDI_XY_Z(reg8.H, reg8.L, reg8.A, memory)
+    it('should load into memory[XY] value from Z',()=>{
+      expect(memory.readByte(0x0001)).to.equal(45)
+    })
+    it('should increase XY by 1',()=>{
+      expect(memory.reg8(reg8.H)).to.equal(0)
+      expect(memory.reg8(reg8.L)).to.equal(2)
+    })
+    expectNumberOfCycle(2, memory)
+  })
+  
+  describe('DAX',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 0x3C)
+    memory.setZeroFlag(false)
+    memory.setSubtractFlag(false)
+    memory.setHalfCarryFlag(true)
+    memory.setCarryFlag(false)
+
+
+    opcodes.DAX(reg8.A, memory)
+    it('should correct BCD value stored in register X respecting flags',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(0x42)
+    })
+    expectNumberOfCycle(1, memory)
+  })
+
+  describe('JR_Z_r8',()=>{
+    describe('with zero flag === true',()=>{
+      const memory = Memory.createEmptyMemory()
+      memory.setPC(0x0002)
+      memory.writeByte(0x0002,4)
+      memory.setZeroFlag(true)
+
+      it('should increase PC by memory[PC] when zero flag is set to false',()=>{
+        opcodes.JR_Z_r8(memory)
+        expect(memory.PC()).to.equal(7)
+
+      })
+      expectNumberOfCycle(3,memory)
+    })
+
+    describe('with zero flag === false',()=>{
+      const memory = Memory.createEmptyMemory()
+      memory.setPC(0x0002)
+      memory.writeByte(0x0002,4)
+      memory.setZeroFlag(false)
+
+      it('should increase PC by memory[PC] when zero flag is set to true',()=>{
+        opcodes.JR_Z_r8(memory)
+        expect(memory.PC()).to.equal(3)
+      })
+      expectNumberOfCycle(2,memory)
+    })
+  })
+
+  describe('LDI_X_YZ',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A,0)
+    memory.setReg8(reg8.H,0)
+    memory.setReg8(reg8.L,1)
+    memory.writeByte(0x0001,56)
+
+    opcodes.LDI_X_YZ(reg8.A, reg8.H, reg8.L, memory)
+    it('should load into Z memory[XY]',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(56)
+    })
+    it('should increase XY by 1',()=>{
+      expect(memory.reg8(reg8.H)).to.equal(0)
+      expect(memory.reg8(reg8.L)).to.equal(2)
+    })
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('CPL',()=>{
+    
+  })
 })

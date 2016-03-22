@@ -35,6 +35,22 @@ export default OperationCodesMapping = [
   opcodes.INC_X.bind(undefined, reg8.E),
   opcodes.DEC_X.bind(undefined, reg8.E),
   opcodes.LD_X_d8.bind(undefined, reg8.E),
-  opcodes.RRA
+  opcodes.RR_X,
   //0x20
+  opcodes.JR_NZ_r8,
+  opcodes.LD_XY_d16.bind(undefined, reg8.H, reg8.L),
+  opcodes.LDI_XY_Z.bind(undefined, reg8.H, reg8.L, reg8.A),
+  opcodes.INC_XY.bind(undefined, reg8.H, reg8.L),
+  opcodes.INC_X.bind(undefined, reg8.H),
+  opcodes.DEC_X.bind(undefined, reg8.H),
+  opcodes.LD_X_d8.bind(undefined, reg8.H),
+  opcodes.DAX.bind(undefined, reg8.A),
+  opcodes.JR_Z_r8,
+  opcodes.ADD_XY_ZQ.bind(undefined, reg8.H, reg8.L, reg8.H, reg8.L),
+  opcodes.LDI_X_YZ.bind(undefined, reg8.A, reg8.H, reg8.L),
+  opcodes.DEC_XY.bind(undefined, reg8.H, reg8.L),
+  opcodes.INC_X.bind(undefined, reg8.L),
+  opcodes.DEC_X.bind(undefined, reg8.L),
+  opcodes.LD_X_d8.bind(undefined, reg8.L),
+  opcodes.CPL,
 ]
