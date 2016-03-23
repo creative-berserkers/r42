@@ -26,22 +26,6 @@ stop flag: 10011
 const expectedBufferSize = 0x10012
 
 export const reg8 = {
-  A:'A',
-  B:'B',
-  C:'C',
-  D:'D',
-  E:'E',
-  H:'H',
-  L:'L',
-  F:'F'
-}
-
-const reg16 = {
-  SP : 'SP',
-  PC : 'PC'
-}
-
-const reg8Mapping = {
   A : 0x10000,
   B : 0x10001,
   C : 0x10002,
@@ -49,7 +33,16 @@ const reg8Mapping = {
   E : 0x10004,
   H : 0x10005,
   L : 0x10006,
-  F : 0x10007
+  F : 0x10007,
+  S : 0x10008,
+  P : 0x10009
+}
+
+export const flags = {
+  zero : [reg8.F, 0x80],
+  subtract: [reg8.F, 0x40],
+  halfCarry: [reg8.F, 0x20],
+  carry: [reg8.F, 0x10]
 }
 
 const SPMapping = 0x00008
@@ -81,21 +74,11 @@ function createMemory(buffer){
       byteView[addr] = value>>8
       byteView[addr+1]=value
     },
-    reg8(name){
-      const addr = reg8Mapping[name]
-      if(addr !== undefined){
-        return byteView[addr]
-      } else {
-        throw Error('Unknown register '+name)
-      }
+    reg8(addr){
+      return byteView[addr]
     },
-    setReg8(name, value){
-      const addr = reg8Mapping[name]
-      if(addr !== undefined){
-        byteView[addr] = value
-      } else {
-        throw Error('Unknown register '+name)
-      }
+    setReg8(addr, value){
+      byteView[addr] = value
     },
     PC(){
       return (byteView[PCMapping]<<8)+byteView[PCMapping+1]
@@ -129,44 +112,14 @@ function createMemory(buffer){
     setLastInstructionClock(value){
       byteView[lastInstructionClockMapping] = value
     },
-    zeroFlag(){
-      return (byteView[reg8.F] & 128) !== 0
+    flag(flag){
+      return (byteView[flag[0]] & flag[1]) !== 0
     },
-    setZeroFlag(value){
-      if(value){
-        byteView[reg8.F] = byteView[reg8.F] | 128
+    setFlag(flag, state){
+      if(state){
+        byteView[flag[0]] = byteView[flag[0]] | flag[1]
       } else {
-        byteView[reg8.F] = byteView[reg8.F] & ~128
-      }
-    },
-    subtractFlag(){
-      return (byteView[reg8.F] & 64) !== 0
-    },
-    setSubtractFlag(value){
-      if(value){
-        byteView[reg8.F] = byteView[reg8.F] | 64
-      } else {
-        byteView[reg8.F] = byteView[reg8.F] & ~64
-      }
-    },
-    halfCarryFlag(){
-      return (byteView[reg8.F] & 32) !== 0
-    },
-    setHalfCarryFlag(value){
-      if(value){
-        byteView[reg8.F] = byteView[reg8.F] | 32
-      } else {
-        byteView[reg8.F] = byteView[reg8.F] & ~32
-      }
-    },
-    carryFlag(){
-      return (byteView[reg8.F] & 16) !== 0
-    },
-    setCarryFlag(value){
-      if(value){
-        byteView[reg8.F] = byteView[reg8.F] | 16
-      } else {
-        byteView[reg8.F] = byteView[reg8.F] & ~16
+        byteView[flag[0]] = byteView[flag[0]] & ~flag[1]
       }
     },
     stopFlag(){

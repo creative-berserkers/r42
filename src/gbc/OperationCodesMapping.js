@@ -1,11 +1,11 @@
 import * as opcodes from './OperationCodes'
-import {reg8} from './Memory'
+import {reg8, flags} from './Memory'
 
 export default OperationCodesMapping = [
   //0X00
   opcodes.NOP,
   opcodes.LD_XY_d16.bind(undefined, reg8.B, reg8.C),
-  opcodes.LD_XY_Z.bind(undefined, reg8.B, reg8.C, reg8.A),
+  opcodes.LD_mXY_Z.bind(undefined, reg8.B, reg8.C, reg8.A),
   opcodes.INC_XY.bind(undefined, reg8.B, reg8.C),
   opcodes.INC_X.bind(undefined, reg8.B),
   opcodes.DEC_X.bind(undefined, reg8.B),
@@ -13,7 +13,7 @@ export default OperationCodesMapping = [
   opcodes.RLC_X.bind(undefined, reg8.A),
   opcodes.LD_a16_SP,
   opcodes.ADD_XY_ZQ.bind(undefined, reg8.H, reg8.L, reg8.B, reg8.C),
-  opcodes.LD_X_YZ.bind(undefined, reg8.A, reg8.B, reg8.C),
+  opcodes.LD_X_mYZ.bind(undefined, reg8.A, reg8.B, reg8.C),
   opcodes.DEC_XY.bind(undefined, reg8.B, reg8.C),
   opcodes.INC_X.bind(undefined, reg8.C),
   opcodes.DEC_X.bind(undefined, reg8.C),
@@ -22,7 +22,7 @@ export default OperationCodesMapping = [
   //0x10
   opcodes.STOP,
   opcodes.LD_XY_d16.bind(undefined, reg8.D, reg8.E),
-  opcodes.LD_XY_Z.bind(undefined, reg8.D, reg8.E, reg8.A),
+  opcodes.LD_mXY_Z.bind(undefined, reg8.D, reg8.E, reg8.A),
   opcodes.INC_XY.bind(undefined, reg8.D, reg8.E),
   opcodes.INC_X.bind(undefined, reg8.D),
   opcodes.DEC_X.bind(undefined, reg8.D),
@@ -30,27 +30,39 @@ export default OperationCodesMapping = [
   opcodes.RL_X.bind(undefined, reg8.A),
   opcodes.JR_r8,
   opcodes.ADD_XY_ZQ.bind(undefined, reg8.H, reg8.L, reg8.D, reg8.E),
-  opcodes.LD_X_YZ.bind(undefined, reg8.A, reg8.D, reg8.E),
+  opcodes.LD_X_mYZ.bind(undefined, reg8.A, reg8.D, reg8.E),
   opcodes.DEC_XY.bind(undefined, reg8.D, reg8.E),
   opcodes.INC_X.bind(undefined, reg8.E),
   opcodes.DEC_X.bind(undefined, reg8.E),
   opcodes.LD_X_d8.bind(undefined, reg8.E),
   opcodes.RR_X,
   //0x20
-  opcodes.JR_NZ_r8,
+  opcodes.JR_SF_r8.bind(undefined, false, flags.zero),
   opcodes.LD_XY_d16.bind(undefined, reg8.H, reg8.L),
-  opcodes.LDI_XY_Z.bind(undefined, reg8.H, reg8.L, reg8.A),
+  opcodes.LD_N_mXY_Z.bind(undefined,1, reg8.H, reg8.L, reg8.A),
   opcodes.INC_XY.bind(undefined, reg8.H, reg8.L),
   opcodes.INC_X.bind(undefined, reg8.H),
   opcodes.DEC_X.bind(undefined, reg8.H),
   opcodes.LD_X_d8.bind(undefined, reg8.H),
   opcodes.DAX.bind(undefined, reg8.A),
-  opcodes.JR_Z_r8,
+  opcodes.JR_SF_r8.bind(undefined, true, flags.zero),
   opcodes.ADD_XY_ZQ.bind(undefined, reg8.H, reg8.L, reg8.H, reg8.L),
-  opcodes.LDI_X_YZ.bind(undefined, reg8.A, reg8.H, reg8.L),
+  opcodes.LD_N_X_mYZ.bind(undefined,1, reg8.A, reg8.H, reg8.L),
   opcodes.DEC_XY.bind(undefined, reg8.H, reg8.L),
   opcodes.INC_X.bind(undefined, reg8.L),
   opcodes.DEC_X.bind(undefined, reg8.L),
   opcodes.LD_X_d8.bind(undefined, reg8.L),
-  opcodes.CPL,
+  opcodes.CPL_X.bind(undefined, reg8.A),
+  //0x30
+  opcodes.JR_SF_r8.bind(undefined, false, flags.carry),
+  opcodes.LD_XY_d16.bind(undefined, reg8.S, reg8.P),
+  opcodes.LD_N_mXY_Z.bind(undefined, -1, reg8.H, reg8.L),
+  opcodes.INC_XY.bind(undefined, reg8.S, reg8.P),
+  opcodes.INC_mXY.bind(undefined, reg8.H, reg8.L),
+  opcodes.DEC_mXY.bind(undefined, reg8.H, reg8.L),
+  opcodes.LD_mXY_d8.bind(undefined, reg8.H, reg8.L),
+  opcodes.SCF,
+  opcodes.JR_SF_r8.bind(undefined, true, flags.carry),
+  opcodes.ADD_XY_ZQ.bind(undefined, reg8.H, reg8.L, reg8.S, reg8.P),
+  opcodes.LD_N_X_mYZ.bind(undefined,-1,reg8.A,reg8.H, reg8.L)
 ]

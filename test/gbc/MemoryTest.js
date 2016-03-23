@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import Memory from './../../src/gbc/Memory'
+import Memory, {reg8, flags} from './../../src/gbc/Memory'
 
 describe('Memory test', ()=>{
 
@@ -23,19 +23,13 @@ describe('Memory test', ()=>{
   })
 
   it('should modify 8bit registers respecting overflow',()=>{
-    const registers = ['A','B','C','D','E','H','L','F']
+    const registers = [reg8.A,reg8.B,reg8.C,reg8.D,reg8.E,reg8.H,reg8.L,reg8.F]
     const memory = Memory.createEmptyMemory()
 
-    registers.forEach((reg, index)=>{
+    registers.forEach((reg)=>{
       memory.setReg8(reg, 260)
       expect(memory.reg8(reg)).to.equal(4)
     })
-  })
-
-  it('Should throw unknown register on 8bit register read and write',()=>{
-    const memory = Memory.createEmptyMemory()
-    expect(memory.setReg8.bind(undefined, 'X', 1)).to.throw('Unknown register X')
-    expect(memory.reg8.bind(undefined, 'X')).to.throw('Unknown register X')
   })
 
   it('should modify PC register respecting overflow',()=>{
@@ -66,35 +60,15 @@ describe('Memory test', ()=>{
     expect(memory.lastInstructionClock()).to.equal(16)
   })
 
-  it('should set Zero Flag', ()=>{
-    const memory = Memory.createEmptyMemory()
-    memory.setZeroFlag(true)
-    expect(memory.zeroFlag()).to.equal(true)
-    memory.setZeroFlag(false)
-    expect(memory.zeroFlag()).to.equal(false)
-  })
+  const testFlags = [flags.zero, flags.subtract, flags.halfCarry, flags.carry]
+  const memory = Memory.createEmptyMemory()
 
-  it('should set Subtract Flag', ()=>{
-    const memory = Memory.createEmptyMemory()
-    memory.setSubtractFlag(true)
-    expect(memory.subtractFlag()).to.equal(true)
-    memory.setSubtractFlag(false)
-    expect(memory.subtractFlag()).to.equal(false)
-  })
-
-  it('should set Half Carry Flag', ()=>{
-    const memory = Memory.createEmptyMemory()
-    memory.setHalfCarryFlag(true)
-    expect(memory.halfCarryFlag()).to.equal(true)
-    memory.setHalfCarryFlag(false)
-    expect(memory.halfCarryFlag()).to.equal(false)
-  })
-
-  it('should set Carry Flag', ()=>{
-    const memory = Memory.createEmptyMemory()
-    memory.setCarryFlag(true)
-    expect(memory.carryFlag()).to.equal(true)
-    memory.setCarryFlag(false)
-    expect(memory.carryFlag()).to.equal(false)
+  it('should set and read flags', ()=>{
+    testFlags.forEach((flag)=>{
+      memory.setFlag(flag, true)
+      expect(memory.flag(flag)).to.equal(true)
+      memory.setFlag(flag, false)
+      expect(memory.flag(flag)).to.equal(false)
+    })
   })
 })

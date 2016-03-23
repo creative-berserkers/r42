@@ -1,5 +1,5 @@
 import * as opcodes from '../../src/gbc/OperationCodes'
-import Memory,{reg8} from './../../src/gbc/Memory'
+import Memory,{reg8, flags} from './../../src/gbc/Memory'
 import {expect} from 'chai'
 
 function expectNumberOfCycle(cycle, memory){
@@ -10,25 +10,25 @@ function expectNumberOfCycle(cycle, memory){
 
 function expectZeroFlag(flag, memory){
   it(`should set zero flag to ${flag}`,()=>{
-    expect(memory.zeroFlag()).to.equal(flag)
+    expect(memory.flag(flags.zero)).to.equal(flag)
   })
 }
 
 function expectSubtractFlag(flag, memory){
   it(`should set subtract flag to ${flag}`,()=>{
-    expect(memory.subtractFlag()).to.equal(flag)
+    expect(memory.flag(flags.subtract)).to.equal(flag)
   })
 }
 
 function expectHalfCarryFlag(flag, memory){
   it(`should set half carry flag to ${flag}`,()=>{
-    expect(memory.halfCarryFlag()).to.equal(flag)
+    expect(memory.flag(flags.halfCarry)).to.equal(flag)
   })
 }
 
 function expectCarryFlag(flag, memory){
   it(`should set carry flag to ${flag}`,()=>{
-    expect(memory.carryFlag()).to.equal(flag)
+    expect(memory.flag(flags.carry)).to.equal(flag)
   })
 }
 
@@ -62,14 +62,14 @@ describe('Operation codes test', ()=>{
     expectNumberOfCycle(3,memory)
   })
 
-  describe('LD_XY_Z',()=>{
+  describe('LD_mXY_Z',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.B, 0)
     memory.setReg8(reg8.C, 1)
     memory.setReg8(reg8.A, 18)
     memory.writeByte(0x0001, 0)
 
-    opcodes.LD_XY_Z(reg8.B,reg8.C, reg8.A, memory)
+    opcodes.LD_mXY_Z(reg8.B,reg8.C, reg8.A, memory)
 
     it('should write into memory[X<<8+Y] value from Z',()=>{
       expect(memory.readByte(0x0001)).to.equal(18)
@@ -145,10 +145,10 @@ describe('Operation codes test', ()=>{
   describe('RLC_X',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.A, 130)
-    memory.setZeroFlag(true)
-    memory.setSubtractFlag(true)
-    memory.setHalfCarryFlag(true)
-    memory.setCarryFlag(false)
+    memory.setFlag(flags.zero, true)
+    memory.setFlag(flags.subtract, true)
+    memory.setFlag(flags.halfCarry, true)
+    memory.setFlag(flags.carry, false)
 
     opcodes.RLC_X(reg8.A, memory)
 
@@ -198,14 +198,14 @@ describe('Operation codes test', ()=>{
     expectNumberOfCycle(2, memory)
   })
 
-  describe('LD_X_YZ',()=>{
+  describe('LD_X_mYZ',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.A, 0)
     memory.setReg8(reg8.B, 0)
     memory.setReg8(reg8.C, 1)
     memory.writeByte(0x0001, 35)
 
-    opcodes.LD_X_YZ(reg8.A, reg8.B, reg8.C, memory)
+    opcodes.LD_X_mYZ(reg8.A, reg8.B, reg8.C, memory)
 
     it('should load memory[YZ] and store it into X',()=>{
       expect(memory.reg8(reg8.A)).to.equal(35)
@@ -229,10 +229,10 @@ describe('Operation codes test', ()=>{
   describe('RRC_X',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.A, 129)
-    memory.setZeroFlag(true)
-    memory.setSubtractFlag(true)
-    memory.setHalfCarryFlag(true)
-    memory.setCarryFlag(false)
+    memory.setFlag(flags.zero, true)
+    memory.setFlag(flags.subtract, true)
+    memory.setFlag(flags.halfCarry, true)
+    memory.setFlag(flags.carry, false)
 
     opcodes.RRC_X(reg8.A, memory)
     it('should rotate register X to the right respecting carry',()=>{
@@ -253,10 +253,10 @@ describe('Operation codes test', ()=>{
   describe('RL_X',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.A, 130)
-    memory.setZeroFlag(true)
-    memory.setSubtractFlag(true)
-    memory.setHalfCarryFlag(true)
-    memory.setCarryFlag(true)
+    memory.setFlag(flags.zero, true)
+    memory.setFlag(flags.subtract, true)
+    memory.setFlag(flags.halfCarry, true)
+    memory.setFlag(flags.carry, true)
 
     opcodes.RL_X(reg8.A, memory)
     it('should rotate register X to the left',()=>{
@@ -280,10 +280,10 @@ describe('Operation codes test', ()=>{
   describe('RR_X',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.A, parseInt('10000010', 2))
-    memory.setZeroFlag(true)
-    memory.setSubtractFlag(true)
-    memory.setHalfCarryFlag(true)
-    memory.setCarryFlag(true)
+    memory.setFlag(flags.zero, true)
+    memory.setFlag(flags.subtract, true)
+    memory.setFlag(flags.halfCarry, true)
+    memory.setFlag(flags.carry, true)
 
     opcodes.RR_X(reg8.A, memory)
     it('should rotate register right',()=>{
@@ -292,17 +292,16 @@ describe('Operation codes test', ()=>{
     expectNumberOfCycle(1, memory)
   })
 
-  describe('JR_NZ_r8',()=>{
+  describe('JR_SF_r8',()=>{
     describe('with zero flag === false',()=>{
       const memory = Memory.createEmptyMemory()
       memory.setPC(0x0002)
       memory.writeByte(0x0002,4)
-      memory.setZeroFlag(false)
+      memory.setFlag(flags.zero, false)
 
+      opcodes.JR_SF_r8(false, flags.zero, memory)
       it('should increase PC by memory[PC] when zero flag is set to false',()=>{
-        opcodes.JR_NZ_r8(memory)
         expect(memory.PC()).to.equal(7)
-
       })
       expectNumberOfCycle(3,memory)
     })
@@ -311,24 +310,25 @@ describe('Operation codes test', ()=>{
       const memory = Memory.createEmptyMemory()
       memory.setPC(0x0002)
       memory.writeByte(0x0002,4)
-      memory.setZeroFlag(true)
+      memory.setFlag(flags.zero, true)
 
+      opcodes.JR_SF_r8(false, flags.zero, memory)
       it('should increase PC by memory[PC] when zero flag is set to true',()=>{
-        opcodes.JR_NZ_r8(memory)
+
         expect(memory.PC()).to.equal(3)
       })
       expectNumberOfCycle(2,memory)
     })
   })
 
-  describe('LDI_XY_Z',()=>{
+  describe('LD_N_mXY_Z',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.A,45)
     memory.setReg8(reg8.H,0)
     memory.setReg8(reg8.L,1)
     memory.writeByte(0x0001,0)
 
-    opcodes.LDI_XY_Z(reg8.H, reg8.L, reg8.A, memory)
+    opcodes.LD_N_mXY_Z(1,reg8.H, reg8.L, reg8.A, memory)
     it('should load into memory[XY] value from Z',()=>{
       expect(memory.readByte(0x0001)).to.equal(45)
     })
@@ -342,10 +342,10 @@ describe('Operation codes test', ()=>{
   describe('DAX',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.A, 0x3C)
-    memory.setZeroFlag(false)
-    memory.setSubtractFlag(false)
-    memory.setHalfCarryFlag(true)
-    memory.setCarryFlag(false)
+    memory.setFlag(flags.zero, false)
+    memory.setFlag(flags.subtract, false)
+    memory.setFlag(flags.halfCarry, true)
+    memory.setFlag(flags.carry, false)
 
 
     opcodes.DAX(reg8.A, memory)
@@ -355,43 +355,14 @@ describe('Operation codes test', ()=>{
     expectNumberOfCycle(1, memory)
   })
 
-  describe('JR_Z_r8',()=>{
-    describe('with zero flag === true',()=>{
-      const memory = Memory.createEmptyMemory()
-      memory.setPC(0x0002)
-      memory.writeByte(0x0002,4)
-      memory.setZeroFlag(true)
-
-      it('should increase PC by memory[PC] when zero flag is set to false',()=>{
-        opcodes.JR_Z_r8(memory)
-        expect(memory.PC()).to.equal(7)
-
-      })
-      expectNumberOfCycle(3,memory)
-    })
-
-    describe('with zero flag === false',()=>{
-      const memory = Memory.createEmptyMemory()
-      memory.setPC(0x0002)
-      memory.writeByte(0x0002,4)
-      memory.setZeroFlag(false)
-
-      it('should increase PC by memory[PC] when zero flag is set to true',()=>{
-        opcodes.JR_Z_r8(memory)
-        expect(memory.PC()).to.equal(3)
-      })
-      expectNumberOfCycle(2,memory)
-    })
-  })
-
-  describe('LDI_X_YZ',()=>{
+  describe('LD_N_X_YZ',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.A,0)
     memory.setReg8(reg8.H,0)
     memory.setReg8(reg8.L,1)
     memory.writeByte(0x0001,56)
 
-    opcodes.LDI_X_YZ(reg8.A, reg8.H, reg8.L, memory)
+    opcodes.LD_N_X_YZ( 1,reg8.A, reg8.H, reg8.L, memory)
     it('should load into Z memory[XY]',()=>{
       expect(memory.reg8(reg8.A)).to.equal(56)
     })
@@ -402,7 +373,90 @@ describe('Operation codes test', ()=>{
     expectNumberOfCycle(2, memory)
   })
 
-  describe('CPL',()=>{
+  describe('CPL_X',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A,232)
+    memory.setFlag(flags.subtract, false)
+    memory.setFlag(flags.halfCarry, false)
+
+    opcodes.CPL_X(reg8.A, memory)
+    it('should XOR the register X with value 0xFF',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(23)
+    })
+    expectSubtractFlag(true, memory)
+    expectHalfCarryFlag(true, memory)
+    expectNumberOfCycle(1, memory)
+  })
+
+  describe('INC_mXY',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.H,0x00)
+    memory.setReg8(reg8.L,0x01)
+    memory.writeByte(0x0001, 15)
+    memory.setFlag(flags.zero, false)
+    memory.setFlag(flags.subtract, false)
+    memory.setFlag(flags.halfCarry, false)
+
+    opcodes.INC_mXY(reg8.H,reg8.L, memory)
+
+    it('should increment value at memory[XY] by 1',()=>{
+      expect(memory.readByte(0x0001)).to.equal(16)
+    })
+    expectZeroFlag(false, memory)
+    expectHalfCarryFlag(true, memory)
+    expectSubtractFlag(false, memory)
+    expectNumberOfCycle(3, memory)
+  })
+
+  describe('DEC_mXY',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.H,0x00)
+    memory.setReg8(reg8.L,0x01)
+    memory.writeByte(0x0001, 0)
+    memory.setFlag(flags.zero, false)
+    memory.setFlag(flags.subtract, false)
+    memory.setFlag(flags.halfCarry, false)
+
+    opcodes.DEC_mXY(reg8.H,reg8.L, memory)
+
+    it('should decrement value at memory[XY] by 1',()=>{
+      expect(memory.readByte(0x0001)).to.equal(255)
+    })
+    expectZeroFlag(false, memory)
+    expectHalfCarryFlag(true, memory)
+    expectSubtractFlag(true, memory)
+    expectNumberOfCycle(3, memory)
+  })
+
+  describe('LD_mXY_d8',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setPC(0x0000)
+    memory.setReg8(reg8.H,0x00)
+    memory.setReg8(reg8.L,0x01)
+    memory.writeByte(0x0000, 99)
+    memory.writeByte(0x0001, 0)
+
+    opcodes.LD_mXY_d8(reg8.H, reg8.L, memory)
+    it('should load into memory[XY] value from memory[PC]',()=>{
+      expect(memory.readByte(0x0001)).to.equal(99)
+    })
+    expectNumberOfCycle(3, memory)
+  })
+
+  describe('SCF',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setFlag(flags.carry, false)
+    memory.setFlag(flags.halfCarry, true)
+    memory.setFlag(flags.subtract, true)
+
+    opcodes.SCF(memory)
+
+    expectCarryFlag(true, memory)
+    expectHalfCarryFlag(false, memory)
+    expectSubtractFlag(false, memory)
+  })
+
+  describe('LD_N_X_mYZ',()=>{
     
   })
 })
