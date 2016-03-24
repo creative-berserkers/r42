@@ -42,7 +42,9 @@ export const flags = {
   zero : [reg8.F, 0x80],
   subtract: [reg8.F, 0x40],
   halfCarry: [reg8.F, 0x20],
-  carry: [reg8.F, 0x10]
+  carry: [reg8.F, 0x10],
+  stop: [0x10011,0x80],
+  halt: [0x10011, 0x40]
 }
 
 const SPMapping = 0x00008
@@ -50,8 +52,6 @@ const PCMapping = 0x0000A
 
 const lastInstructionClockMapping = 0x1000C
 const clockMapping = 0x1000D
-
-const stopMapping = 0x10011
 
 function createMemory(buffer){
   if(buffer.byteLength != expectedBufferSize){
@@ -120,16 +120,6 @@ function createMemory(buffer){
         byteView[flag[0]] = byteView[flag[0]] | flag[1]
       } else {
         byteView[flag[0]] = byteView[flag[0]] & ~flag[1]
-      }
-    },
-    stopFlag(){
-      return byteView[stopMapping] === 1
-    },
-    setStopFlag(flag){
-      if(flag){
-        byteView[stopMapping] = 1
-      } else {
-        byteView[stopMapping] = 0
       }
     }
   }

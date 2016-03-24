@@ -245,7 +245,7 @@ describe('Operation codes test', ()=>{
     
     opcodes.STOP(memory)
     it('should set stop flag',()=>{
-      expect(memory.stopFlag()).to.equal(true)
+      expect(memory.flag(flags.stop)).to.equal(true)
     })
     expectNumberOfCycle(1, memory)
   })
@@ -355,14 +355,14 @@ describe('Operation codes test', ()=>{
     expectNumberOfCycle(1, memory)
   })
 
-  describe('LD_N_X_YZ',()=>{
+  describe('LD_N_X_mYZ',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.A,0)
     memory.setReg8(reg8.H,0)
     memory.setReg8(reg8.L,1)
     memory.writeByte(0x0001,56)
 
-    opcodes.LD_N_X_YZ( 1,reg8.A, reg8.H, reg8.L, memory)
+    opcodes.LD_N_X_mYZ( 1,reg8.A, reg8.H, reg8.L, memory)
     it('should load into Z memory[XY]',()=>{
       expect(memory.reg8(reg8.A)).to.equal(56)
     })
@@ -456,7 +456,55 @@ describe('Operation codes test', ()=>{
     expectSubtractFlag(false, memory)
   })
 
-  describe('LD_N_X_mYZ',()=>{
-    
+  describe('CCF',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setFlag(flags.carry, false)
+    memory.setFlag(flags.halfCarry, true)
+    memory.setFlag(flags.subtract, true)
+
+    opcodes.CCF(memory)
+
+    expectCarryFlag(true, memory)
+    expectHalfCarryFlag(false, memory)
+    expectSubtractFlag(false, memory)
+  })
+
+  describe('LD_X_Y',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.C, 0x45)
+    memory.setReg8(reg8.B, 0x00)
+
+    opcodes.LD_X_Y(reg8.B, reg8.C, memory)
+    it('should load Y into X',()=>{
+      expect(memory.reg8(reg8.B)).to.equal(0x45)
+    })
+    expectNumberOfCycle(1, memory)
+  })
+
+  describe('HALT',()=>{
+    const memory = Memory.createEmptyMemory()
+
+    opcodes.HALT(memory)
+    it('should set halt flag',()=>{
+      expect(memory.flag(flags.halt)).to.equal(true)
+    })
+    expectNumberOfCycle(1, memory)
+  })
+
+  describe('ADD_X_Y',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 10)
+    memory.setReg8(reg8.B, 6)
+
+    opcodes.ADD_X_Y(reg8.A, reg8.B, memory)
+    it('should add X to Y and store result in A',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(16)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(false, memory)
+    expectHalfCarryFlag(true, memory)
+    expectCarryFlag(false, memory)
+    expectNumberOfCycle(1, memory)
+
   })
 })

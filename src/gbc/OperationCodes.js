@@ -98,7 +98,7 @@ export function RRC_X(regX, memory){
 }
 
 export function STOP(memory){
-  memory.setStopFlag(true)
+  memory.setFlag(flags.stop, true)
   memory.setLastInstructionClock(1)
 }
 
@@ -181,7 +181,7 @@ export function DAX(regX, memory){
   memory.setLastInstructionClock(1)
 }
 
-export function LD_N_X_YZ(n,regX, regY, regZ, memory){
+export function LD_N_X_mYZ(n,regX, regY, regZ, memory){
   const tmp = (memory.reg8(regY)<<8)+memory.reg8(regZ)
   memory.setReg8(regX, memory.readByte(tmp))
   const tmp2 = tmp + n
@@ -231,11 +231,28 @@ export function SCF(memory) {
   memory.setFlag(flags.subtract, false)
 }
 
-export function LD_N_X_mYZ(n,regX, regY, regZ, memory){
-  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
-  memory.setReg8(regX, memory.readByte(tmp))
-  const tmp2 = tmp + n
-  memory.setReg8(regY, tmp2>>8)
-  memory.setReg8(regZ, tmp2)
-  memory.setLastInstructionClock(2)
+export function CCF(memory) {
+  memory.setFlag(flags.carry, !memory.flag(flags.carry))
+  memory.setFlag(flags.halfCarry, false)
+  memory.setFlag(flags.subtract, false)
+}
+
+export function LD_X_Y(regX, regY, memory){
+  memory.setReg8(regX, memory.reg8(regY))
+  memory.setLastInstructionClock(1)
+}
+
+export function HALT(memory){
+  memory.setFlag(flags.halt, true)
+  memory.setLastInstructionClock(1)
+}
+
+export function ADD_X_Y(regX, regY, memory){
+  const sum = memory.reg8(regX) + memory.reg8(regY);
+  memory.setFlag(flags.halfCarry, ((sum & 0xF) < (memory.reg8(regX)) & 0xF))
+  memory.setFlag(flags.carry,(sum > 0xFF))
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.subtract, false)
+  memory.setLastInstructionClock(1)
 }
