@@ -497,7 +497,7 @@ describe('Operation codes test', ()=>{
     memory.setReg8(reg8.B, 6)
 
     opcodes.ADD_X_Y(reg8.A, reg8.B, memory)
-    it('should add X to Y and store result in A',()=>{
+    it('should add X to Y and store result in X',()=>{
       expect(memory.reg8(reg8.A)).to.equal(16)
     })
     expectZeroFlag(false, memory)
@@ -505,6 +505,94 @@ describe('Operation codes test', ()=>{
     expectHalfCarryFlag(true, memory)
     expectCarryFlag(false, memory)
     expectNumberOfCycle(1, memory)
+  })
 
+  describe('ADD_X_mYZ',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 10)
+    memory.setReg8(reg8.H, 0)
+    memory.setReg8(reg8.L, 1)
+    memory.writeByte(0x0001,6)
+
+
+    opcodes.ADD_X_mYZ(reg8.A, reg8.H, reg8.L, memory)
+    it('should add X to memory[YZ] and store result in X',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(16)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(false, memory)
+    expectHalfCarryFlag(true, memory)
+    expectCarryFlag(false, memory)
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('ADC_X_Y',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 10)
+    memory.setReg8(reg8.B, 5)
+    memory.setFlag(flags.carry, true)
+
+    opcodes.ADC_X_Y(reg8.A, reg8.B, memory)
+    it('should add X to Y respecting carry flag and store result in X',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(16)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(false, memory)
+    expectHalfCarryFlag(true, memory)
+    expectCarryFlag(false, memory)
+    expectNumberOfCycle(1, memory)
+  })
+
+  describe('ADC_X_mYZ',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 10)
+    memory.setReg8(reg8.H, 0)
+    memory.setReg8(reg8.L, 1)
+    memory.writeByte(0x0001,5)
+    memory.setFlag(flags.carry, true)
+
+    opcodes.ADC_X_mYZ(reg8.A, reg8.H, reg8.L, memory)
+    it('should add X to memory[YZ] respecting carry flag and store result in X',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(16)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(false, memory)
+    expectHalfCarryFlag(true, memory)
+    expectCarryFlag(false, memory)
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('SUB_X_Y',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 0)
+    memory.setReg8(reg8.B, 1)
+
+    opcodes.SUB_X_Y(reg8.A, reg8.B, memory)
+    it('should subtract Y from X and store result in X',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(255)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(true, memory)
+    expectHalfCarryFlag(true, memory)
+    expectCarryFlag(true, memory)
+    expectNumberOfCycle(1, memory)
+  })
+
+  describe('SUB_X_mYZ',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 0)
+    memory.setReg8(reg8.H, 0x00)
+    memory.setReg8(reg8.L, 0x01)
+    memory.writeByte(0x0001, 1)
+
+    opcodes.SUB_X_mYZ(reg8.A, reg8.H,reg8.L, memory)
+    it('should subtract Y from X and store result in X',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(255)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(true, memory)
+    expectHalfCarryFlag(true, memory)
+    expectCarryFlag(true, memory)
+    expectNumberOfCycle(2, memory)
   })
 })

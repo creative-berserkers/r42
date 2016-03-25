@@ -145,8 +145,22 @@ export default OperationCodesMapping = [
   opcodes.ADD_X_Y.bind(undefined, reg8.A, reg8.E),
   opcodes.ADD_X_Y.bind(undefined, reg8.A, reg8.H),
   opcodes.ADD_X_Y.bind(undefined, reg8.A, reg8.L),
-  opcodes.ADD_X_mYZ.bind(undefined, reg8.A, reg8.H, reg8.L)
-
-
-
+  opcodes.ADD_X_mYZ.bind(undefined, reg8.A, reg8.H, reg8.L),
+  opcodes.ADD_X_Y.bind(undefined, reg8.A, reg8.A),
+  opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.B),
+  opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.C),
+  opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.D),
+  opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.E),
+  opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.L),
+  opcodes.ADC_X_mYZ.bind(undefined, reg8.A, reg8.H, reg8.L),
+  opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.A),
+  //0x90
+  opcodes.SUB_X_Y.bind(undefined, reg8.A, reg8.B),
+  opcodes.SUB_X_Y.bind(undefined, reg8.A, reg8.C),
+  opcodes.SUB_X_Y.bind(undefined, reg8.A, reg8.D),
+  opcodes.SUB_X_Y.bind(undefined, reg8.A, reg8.E),
+  opcodes.SUB_X_Y.bind(undefined, reg8.A, reg8.H),
+  opcodes.SUB_X_Y.bind(undefined, reg8.A, reg8.L),
+  opcodes.SUB_X_mYZ.bind(undefined, reg8.A, reg8.H, reg8.L),
+  opcodes.SUB_X_Y.bind(undefined, reg8.A, reg8.A),
 ]

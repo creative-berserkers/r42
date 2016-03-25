@@ -256,3 +256,56 @@ export function ADD_X_Y(regX, regY, memory){
   memory.setFlag(flags.subtract, false)
   memory.setLastInstructionClock(1)
 }
+
+export function ADD_X_mYZ(regX, regY, regZ, memory){
+  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  const sum = memory.reg8(regX) + memory.readByte(addr)
+  memory.setFlag(flags.halfCarry, (sum & 0xF) < (memory.reg8(regX) & 0xF))
+  memory.setFlag(flags.carry,(sum > 0xFF))
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.subtract, false)
+  memory.setLastInstructionClock(2)
+}
+
+export function ADC_X_Y(regX, regY, memory){
+  const sum = memory.reg8(regX) + memory.reg8(regY) + (memory.flag(flags.carry)? 1 : 0)
+  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) + (memory.reg8(regY) & 0xF) + (memory.flag(flags.carry)? 1 : 0) > 0xF))
+  memory.setFlag(flags.carry,(sum > 0xFF))
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.subtract, false)
+  memory.setLastInstructionClock(1)
+}
+
+export function ADC_X_mYZ(regX, regY, regZ, memory){
+  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  const sum = memory.reg8(regX) + memory.readByte(addr) + (memory.flag(flags.carry)? 1 : 0)
+  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) + memory.readByte(addr) + (memory.flag(flags.carry)? 1 : 0) > 0xF))
+  memory.setFlag(flags.carry,(sum > 0xFF))
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.subtract, false)
+  memory.setLastInstructionClock(2)
+}
+
+export function SUB_X_Y(regX, regY, memory){
+  const sum = memory.reg8(regX) - memory.reg8(regY)
+  memory.setFlag(flags.halfCarry, (memory.reg8(regX) & 0xF) < (sum & 0xF))
+  memory.setFlag(flags.carry,(sum < 0))
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, (sum === 0))
+  memory.setFlag(flags.subtract, true)
+  memory.setLastInstructionClock(1)
+}
+
+export function SUB_X_mYZ(regX, regY, regZ, memory){
+  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  const sum = memory.reg8(regX) - memory.readByte(addr)
+  memory.setFlag(flags.halfCarry, (memory.reg8(regX) & 0xF) < (sum & 0xF))
+  memory.setFlag(flags.carry,(sum < 0))
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, (sum === 0))
+  memory.setFlag(flags.subtract, true)
+  memory.setLastInstructionClock(2)
+}
