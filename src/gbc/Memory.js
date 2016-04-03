@@ -23,7 +23,7 @@ clock : 1000D to 10010
 stop flag: 10011
  */
 
-const expectedBufferSize = 0x10012
+const expectedBufferSize = 0x10013
 
 export const reg8 = {
   A : 0x10000,
@@ -44,7 +44,9 @@ export const flags = {
   halfCarry: [reg8.F, 0x20],
   carry: [reg8.F, 0x10],
   stop: [0x10011,0x80],
-  halt: [0x10011, 0x40]
+  halt: [0x10011, 0x40],
+  illegal: [0x10011, 0x20],
+  ime: [0x10011, 0x10]
 }
 
 const SPMapping = 0x00008
@@ -52,6 +54,8 @@ const PCMapping = 0x0000A
 
 const lastInstructionClockMapping = 0x1000C
 const clockMapping = 0x1000D
+
+const IRQEnableDelayMapping = 0x10012
 
 function createMemory(buffer){
   if(buffer.byteLength != expectedBufferSize){
@@ -111,6 +115,12 @@ function createMemory(buffer){
     },
     setLastInstructionClock(value){
       byteView[lastInstructionClockMapping] = value
+    },
+    IRQEnableDelay(){
+      return byteView[IRQEnableDelayMapping]
+    },
+    setIRQEnableDelay(value){
+      byteView[IRQEnableDelayMapping] = value
     },
     flag(flag){
       return (byteView[flag[0]] & flag[1]) !== 0

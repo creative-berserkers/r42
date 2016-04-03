@@ -1034,4 +1034,328 @@ describe('Operation codes test', ()=>{
     expectCarryFlag(false, memory)
     expectNumberOfCycle(2, memory)
   })
+
+  describe('ILLEGAL',()=>{
+    const memory = Memory.createEmptyMemory()
+
+    opcodes.ILLEGAL(memory)
+    it('should set stop flag to true',()=>{
+      expect(memory.flag(flags.stop)).to.equal(true)
+    })
+    it('should set illegal flag to true',()=>{
+      expect(memory.flag(flags.illegal)).to.equal(true)
+    })
+  })
+
+  describe('SUB_X_d8',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 10)
+    memory.setPC(0x0002)
+    memory.writeByte(0x0002, 11)
+    memory.setFlag(flags.carry, true)
+
+    opcodes.SUB_X_d8(reg8.A, memory)
+    it('should add X to memory[PC] and store result in X',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(255)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(true, memory)
+    expectHalfCarryFlag(true, memory)
+    expectCarryFlag(true, memory)
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('RETI',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setPC(0x0002)
+    memory.setSP(0x0010)
+    memory.writeByte(0x0010, 0x04)
+    memory.writeByte(0x0011, 0x00)
+
+    opcodes.RETI(memory)
+    it('should set PC to 0x0004',()=>{
+      expect(memory.PC()).to.equal(0x0004)
+    })
+    it('should increase SP by 2',()=>{
+      expect(memory.SP()).to.equal(0x0012)
+    })
+    it('should set IRQEnableDelay to 2',()=>{
+      expect(memory.IRQEnableDelay()).to.equal(2)
+    })
+    expectNumberOfCycle(4, memory)
+  })
+
+  describe('SBC_X_d8',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 10)
+    memory.setPC(0x0002)
+    memory.writeByte(0x0002, 10)
+    memory.setFlag(flags.carry, true)
+
+    opcodes.SBC_X_d8(reg8.A, memory)
+    it('should add X to memory[PC] respecting carry flag and store result in X',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(255)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(true, memory)
+    expectHalfCarryFlag(true, memory)
+    expectCarryFlag(true, memory)
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('LDH_ma8_X',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 0x14)
+    memory.setPC(0x0002)
+    memory.writeByte(0x0002, 0x10)
+
+    opcodes.LDH_ma8_X(reg8.A, memory)
+    it('should load into memory[0xFF00 + memory[PC]] value from X',()=>{
+      expect(memory.readByte(0xFF00 + 0x0010)).to.equal(0x14)
+    })
+    it('should increase PC by 1',()=>{
+      expect(memory.PC()).to.equal(0x0003)
+    })
+    expectNumberOfCycle(3, memory)
+  })
+
+  describe('LD_mX_Y',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 0x14)
+    memory.setReg8(reg8.C, 0x10)
+
+    opcodes.LD_mX_Y(reg8.C, reg8.A, memory)
+    it('should load into memory[0xFF00 + X] value from Y',()=>{
+      expect(memory.readByte(0xFF00 + 0x0010)).to.equal(0x14)
+    })
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('AND_X_d8',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 2)
+    memory.setPC(0x0002)
+    memory.writeByte(0x0002, 3)
+
+    opcodes.AND_X_d8(reg8.A, memory)
+    it('should AND X with memory[PC] and store result in X',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(2)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(false, memory)
+    expectHalfCarryFlag(true, memory)
+    expectCarryFlag(false, memory)
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('ADD_SP_r8',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setPC(0x0002)
+    memory.setSP(0x0010)
+    memory.writeByte(0x0002, 2)
+
+    opcodes.ADD_SP_r8(memory)
+    it('should ADD X SP to memory[PC] and store result in SP',()=>{
+      expect(memory.SP()).to.equal(0x0012)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(false, memory)
+    expectHalfCarryFlag(false, memory)
+    expectCarryFlag(false, memory)
+    expectNumberOfCycle(4, memory)
+  })
+
+  describe('JP_mXY',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.H, 0x00)
+    memory.setReg8(reg8.L, 0x03)
+    memory.setPC(0x0000)
+
+    opcodes.JP_mXY(reg8.H, reg8.L, memory)
+    it('should set PC to memory[XY]',()=>{
+      expect(memory.PC()).to.equal(0x0003)
+    })
+    expectNumberOfCycle(1, memory)
+  })
+
+  describe('LD_ma16_X',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 0x14)
+    memory.setPC(0x0002)
+    memory.writeByte(0x0002,0x10)
+    memory.writeByte(0x0003,0x00)
+
+    opcodes.LD_ma16_X(reg8.A, memory)
+    it('should load into memory[PC] value from X',()=>{
+      expect(memory.readByte(0x0010)).to.equal(0x14)
+    })
+    it('should increase PC by 2',()=>{
+      expect(memory.PC()).to.equal(0x0004)
+    })
+    expectNumberOfCycle(4, memory)
+  })
+
+  describe('XOR_X_d8',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 2)
+    memory.setPC(0x0002)
+    memory.writeByte(0x0002, 3)
+
+    opcodes.XOR_X_d8(reg8.A, memory)
+    it('should XOR X with memory[PC] and store result in X',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(1)
+    })
+    it('should increase PC by 1',()=>{
+      expect(memory.PC()).to.equal(0x0003)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(false, memory)
+    expectHalfCarryFlag(false, memory)
+    expectCarryFlag(false, memory)
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('LDH_X_ma8',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 0x10)
+    memory.setPC(0x0002)
+    memory.writeByte(0x0002, 0x14)
+    memory.writeByte(0xFF14, 0x32)
+
+    opcodes.LDH_X_ma8(reg8.A, memory)
+    it('should load into X  value from memory[0xFF00 + memory[PC]]',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(0x32)
+    })
+    it('should increase PC by 1',()=>{
+      expect(memory.PC()).to.equal(0x0003)
+    })
+    expectNumberOfCycle(3, memory)
+  })
+
+  describe('LD_X_mY',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 0x10)
+    memory.setReg8(reg8.C, 0x14)
+
+    memory.writeByte(0xFF14, 0x43)
+
+    opcodes.LD_X_mY(reg8.A, reg8.C, memory)
+    it('should load into X value from memory[0xFF00 + X]',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(0x43)
+    })
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('DI',()=>{
+    const memory = Memory.createEmptyMemory()
+
+    opcodes.DI(memory)
+    it('should set IRQEnableDelay to 0',()=>{
+      expect(memory.IRQEnableDelay()).to.equal(0)
+    })
+    it('should set ime flag to false',()=>{
+      expect(memory.flag(flags.ime)).to.equal(false)
+    })
+    expectNumberOfCycle(1, memory)
+  })
+
+  describe('OR_X_d8',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 2)
+    memory.setPC(0x0002)
+    memory.writeByte(0x0002, 3)
+
+    opcodes.OR_X_d8(reg8.A, memory)
+    it('should XOR X with memory[PC] and store result in X',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(3)
+    })
+    it('should increase PC by 1',()=>{
+      expect(memory.PC()).to.equal(0x0003)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(false, memory)
+    expectHalfCarryFlag(false, memory)
+    expectCarryFlag(false, memory)
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('LD_XY_SP_r8',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.H, 0x00)
+    memory.setReg8(reg8.L, 0x00)
+    memory.setPC(0x0002)
+    memory.setSP(0x0004)
+    memory.writeByte(0x0002, 3)
+
+    opcodes.LD_XY_SP_r8(reg8.H, reg8.L, memory)
+    it('should load SP+memory[PC] and store result in XY',()=>{
+      expect(memory.reg8(reg8.H)).to.equal(0x00)
+      expect(memory.reg8(reg8.L)).to.equal(0x07)
+    })
+    it('should increase PC by 1',()=>{
+      expect(memory.PC()).to.equal(0x0003)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(false, memory)
+    expectHalfCarryFlag(false, memory)
+    expectCarryFlag(false, memory)
+    expectNumberOfCycle(3, memory)
+  })
+
+  describe('LD_SP_XY',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.H, 0x00)
+    memory.setReg8(reg8.L, 0x03)
+
+    opcodes.LD_SP_XY(reg8.H, reg8.L, memory)
+    it('should set SP to XY',()=>{
+      expect(memory.SP()).to.equal(0x0003)
+    })
+    expectNumberOfCycle(2, memory)
+  })
+
+  describe('LD_X_ma16',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 0x00)
+    memory.setPC(0x0002)
+    memory.writeByte(0x0002, 0x07)
+    memory.writeByte(0x0003, 0x00)
+    memory.writeByte(0x0007, 0x24)
+
+    opcodes.LD_X_ma16(reg8.A, memory)
+    it('should set X to memory[memory[PC+1] | memory[PC]]',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(0x0024)
+    })
+    expectNumberOfCycle(4, memory)
+  })
+
+  describe('EI',()=>{
+    const memory = Memory.createEmptyMemory()
+
+    opcodes.EI(memory)
+    it('should set IRQEnableDelay to 2',()=>{
+      expect(memory.IRQEnableDelay()).to.equal(2)
+    })
+    expectNumberOfCycle(1, memory)
+  })
+
+  describe('CP_X_d8',()=>{
+    const memory = Memory.createEmptyMemory()
+    memory.setReg8(reg8.A, 2)
+    memory.setPC(0x0002)
+    memory.writeByte(0x0002, 3)
+
+    opcodes.CP_X_d8(reg8.A, memory)
+    it('should XOR X with memory[PC] and only set flags',()=>{
+      expect(memory.reg8(reg8.A)).to.equal(2)
+    })
+    it('should increase PC by 1',()=>{
+      expect(memory.PC()).to.equal(0x0003)
+    })
+    expectZeroFlag(false, memory)
+    expectSubtractFlag(true, memory)
+    expectHalfCarryFlag(true, memory)
+    expectCarryFlag(true, memory)
+    expectNumberOfCycle(2, memory)
+  })
 })

@@ -521,3 +521,160 @@ export function ADC_X_d8(regX, memory){
   memory.setFlag(flags.subtract, false)
   memory.setLastInstructionClock(2)
 }
+
+export function ILLEGAL(memory){
+  memory.setFlag(flags.stop, true)
+  memory.setFlag(flags.illegal, true)
+}
+
+export function SUB_X_d8(regX, memory){
+  const sum = memory.reg8(regX) - memory.readByte(memory.PC())
+  memory.setPC((memory.PC()) + 1)
+  memory.setFlag(flags.halfCarry, (memory.reg8(regX) & 0xF) < (sum & 0xF))
+  memory.setFlag(flags.carry, sum < 0)
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, sum === 0)
+  memory.setFlag(flags.subtract, true)
+  memory.setLastInstructionClock(2)
+}
+
+export function RETI(memory){
+  memory.setPC((memory.readByte((memory.SP() + 1) & 0xFFFF) << 8) | memory.readByte(memory.SP()))
+  memory.setSP(memory.SP() + 2)
+  memory.setIRQEnableDelay((memory.IRQEnableDelay() === 2 || memory.readByte(memory.PC()) === 0x76) ? 1 : 2)
+  memory.setLastInstructionClock(4)
+}
+
+export function SBC_X_d8(regX, memory){
+  const tmp = memory.readByte(memory.PC())
+  memory.setPC(memory.PC() + 1)
+  const sum = memory.reg8(regX) - tmp - ((memory.flag(flags.carry)) ? 1 : 0)
+  memory.setFlag(flags.halfCarry, (memory.reg8(regX) & 0xF) - (tmp & 0xF) - ((memory.flag(flags.carry)) ? 1 : 0) < 0)
+  memory.setFlag(flags.carry, sum < 0)
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.subtract, true)
+  memory.setLastInstructionClock(2)
+}
+
+export function LDH_ma8_X(regX, memory){
+  memory.writeByte(0xFF00+memory.readByte(memory.PC()),memory.reg8(regX))
+  memory.setPC(memory.PC() + 1)
+  memory.setLastInstructionClock(3)
+}
+
+export function LD_mX_Y(regX, regY, memory){
+  memory.writeByte(0xFF00+memory.reg8(regX),memory.reg8(regY))
+  memory.setLastInstructionClock(2)
+}
+
+export function AND_X_d8(regX, memory){
+  memory.reg8(regX, memory.reg8(regX) & memory.readByte(memory.PC()))
+  memory.setPC(memory.PC() + 1)
+  memory.setFlag(flags.zero, (memory.reg8(regX)) === 0)
+  memory.setFlag(flags.halfCarry, true)
+  memory.setFlag(flags.subtract, false)
+  memory.setFlag(flags.carry, false)
+  memory.setLastInstructionClock(2)
+}
+
+export function ADD_SP_r8(memory){
+  let tmp2 = ((memory.readByte(memory.PC()) << 24) >> 24)
+  memory.setPC(memory.PC() + 1)
+  const tmp = (memory.SP() + tmp2)
+  tmp2 = memory.SP() ^ tmp2 ^ tmp
+  memory.setSP(tmp)
+  memory.setFlag(flags.carry, (tmp2 & 0x100) === 0x100)
+  memory.setFlag(flags.halfCarry, (tmp2 & 0x10) === 0x10)
+  memory.setFlag(flags.zero, false)
+  memory.setFlag(flags.subtract, false)
+  memory.setLastInstructionClock(4)
+}
+
+export function JP_mXY(regX, regY, memory){
+  memory.setPC((memory.reg8(regX)<<8)+memory.reg8(regY))
+  memory.setLastInstructionClock(1)
+}
+
+export function LD_ma16_X(regX, memory){
+  memory.writeByte((memory.readByte((memory.PC() + 1) & 0xFFFF) << 8) | memory.readByte(memory.PC()), memory.reg8(regX))
+  memory.setPC(memory.PC() + 2)
+  memory.setLastInstructionClock(4)
+}
+
+export function XOR_X_d8(regX, memory){
+  memory.setReg8(regX, memory.reg8(regX) ^ memory.readByte(memory.PC()))
+  memory.setPC(memory.PC() + 1)
+  memory.setFlag(flags.zero, memory.reg8(regX) === 0)
+  memory.setFlag(flags.subtract, false)
+  memory.setFlag(flags.halfCarry, false)
+  memory.setFlag(flags.carry, false)
+  memory.setLastInstructionClock(2)
+}
+
+export function LDH_X_ma8(regX, memory) {
+  memory.setReg8(regX, memory.readByte(0xFF00+memory.readByte(memory.PC())))
+  memory.setPC(memory.PC() + 1)
+  memory.setLastInstructionClock(3)
+}
+
+export function LD_X_mY(regX, regY, memory){
+  memory.setReg8(regX, memory.readByte(0xFF00+memory.reg8(regY)))
+  memory.setLastInstructionClock(2)
+}
+
+export function DI(memory){
+  memory.setFlag(flags.ime, false)
+  memory.setIRQEnableDelay(0)
+  memory.setLastInstructionClock(1)
+}
+
+export function OR_X_d8(regX, memory){
+  memory.setReg8(regX, memory.reg8(regX) | memory.readByte(memory.PC()))
+  memory.setFlag(flags.zero, memory.reg8(regX) === 0)
+  memory.setPC(memory.PC() + 1)
+  memory.setFlag(flags.subtract, false)
+  memory.setFlag(flags.halfCarry, false)
+  memory.setFlag(flags.carry, false)
+  memory.setLastInstructionClock(2)
+}
+
+export function LD_XY_SP_r8(regX, regY, memory){
+  let tmp = ((memory.readByte(memory.PC()) << 24) >> 24)
+  memory.setPC(memory.PC() + 1)
+  const tmp2 = (memory.SP() + tmp)
+  memory.setReg8(regX, tmp2>>8)
+  memory.setReg8(regY, tmp2)
+  tmp = memory.SP() ^ tmp ^ tmp2
+  memory.setFlag(flags.carry, ((tmp & 0x100) == 0x100))
+  memory.setFlag(flags.halfCarry, ((tmp & 0x10) == 0x10))
+  memory.setFlag(flags.zero, false)
+  memory.setFlag(flags.subtract,  false)
+  memory.setLastInstructionClock(3)
+}
+
+export function LD_SP_XY(regX, regY, memory){
+  memory.setSP((memory.reg8(regX)<<8)+memory.reg8(regY))
+  memory.setLastInstructionClock(2)
+}
+
+export function LD_X_ma16(regX, memory){
+  memory.setReg8( regX, memory.readByte((memory.readByte((memory.PC() + 1) & 0xFFFF) << 8) | memory.readByte(memory.PC())))
+  memory.setPC(memory.PC() + 2)
+  memory.setLastInstructionClock(4)
+}
+
+export function EI(memory){
+  memory.setIRQEnableDelay((memory.IRQEnableDelay() === 2 || memory.readByte(memory.PC()) === 0x76) ? 1 : 2)
+  memory.setLastInstructionClock(1)
+}
+
+export function CP_X_d8(regX, memory){
+  const sum = memory.reg8(regX) - memory.readByte(memory.PC())
+  memory.setPC(memory.PC() + 1)
+  memory.setFlag(flags.halfCarry, ((sum & 0xF) > (memory.reg8(regX) & 0xF)))
+  memory.setFlag(flags.carry, (sum < 0))
+  memory.setFlag(flags.zero, (sum === 0))
+  memory.setFlag(flags.subtract, true)
+  memory.setLastInstructionClock(2)
+}
