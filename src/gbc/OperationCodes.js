@@ -309,3 +309,215 @@ export function SUB_X_mYZ(regX, regY, regZ, memory){
   memory.setFlag(flags.subtract, true)
   memory.setLastInstructionClock(2)
 }
+
+export function SBC_X_Y(regX, regY, memory){
+  const sum = memory.reg8(regX) - memory.reg8(regY) - ((memory.flag(flags.carry)) ? 1 : 0)
+  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) - (memory.reg8(regY) & 0xF) - (memory.flag(flags.carry)? 1 : 0) > 0xF) < 0)
+  memory.setFlag(flags.carry,(sum < 0))
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, (sum === 0))
+  memory.setFlag(flags.subtract, true)
+  memory.setLastInstructionClock(1)
+}
+
+export function SBC_X_mYZ(regX, regY, regZ, memory){
+  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  const sum = memory.reg8(regX) - memory.readByte(addr) - ((memory.flag(flags.carry)) ? 1 : 0)
+  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) - (memory.reg8(regY) & 0xF) - (memory.flag(flags.carry)? 1 : 0) > 0xF) < 0)
+  memory.setFlag(flags.carry,(sum < 0))
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, (sum === 0))
+  memory.setFlag(flags.subtract, true)
+  memory.setLastInstructionClock(2)
+}
+
+export function AND_X_Y(regX, regY, memory){
+  memory.setReg8(regX, memory.reg8(regX) & memory.reg8(regY))
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.halfCarry, true)
+  memory.setFlag(flags.subtract, false)
+  memory.setFlag(flags.carry,false)
+  memory.setLastInstructionClock(1)
+}
+
+export function AND_X_mYZ(regX, regY, regZ, memory){
+  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  memory.setReg8(regX, memory.reg8(regX) & memory.readByte(addr))
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.halfCarry, true)
+  memory.setFlag(flags.subtract, false)
+  memory.setFlag(flags.carry,false)
+  memory.setLastInstructionClock(2)
+}
+
+export function XOR_X_Y(regX, regY, memory){
+  memory.setReg8(regX, memory.reg8(regX) ^ memory.reg8(regY))
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.halfCarry, false)
+  memory.setFlag(flags.subtract, false)
+  memory.setFlag(flags.carry,false)
+  memory.setLastInstructionClock(1)
+}
+
+export function XOR_X_mYZ(regX, regY, regZ, memory){
+  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  memory.setReg8(regX, memory.reg8(regX) ^ memory.readByte(addr))
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.halfCarry, false)
+  memory.setFlag(flags.subtract, false)
+  memory.setFlag(flags.carry,false)
+  memory.setLastInstructionClock(2)
+}
+
+export function OR_X_Y(regX, regY, memory){
+  memory.setReg8(regX, memory.reg8(regX) | memory.reg8(regY))
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.halfCarry, false)
+  memory.setFlag(flags.subtract, false)
+  memory.setFlag(flags.carry,false)
+  memory.setLastInstructionClock(1)
+}
+
+export function OR_X_mYZ(regX, regY, regZ, memory){
+  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  memory.setReg8(regX, memory.reg8(regX) | memory.readByte(addr))
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.halfCarry, false)
+  memory.setFlag(flags.subtract, false)
+  memory.setFlag(flags.carry,false)
+  memory.setLastInstructionClock(2)
+}
+
+export function CP_X_Y(regX, regY, memory){
+  const tmp = memory.reg8(regX) - memory.reg8(regY)
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.halfCarry, (tmp &0xF) > (memory.reg8(regX) & 0xF))
+  memory.setFlag(flags.subtract, true)
+  memory.setFlag(flags.carry,tmp < 0)
+  memory.setLastInstructionClock(1)
+}
+
+export function CP_X_mYZ(regX, regY, regZ, memory){
+  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  const tmp = memory.reg8(regX) - memory.readByte(addr)
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.halfCarry, (tmp &0xF) > (memory.reg8(regX) & 0xF))
+  memory.setFlag(flags.subtract, true)
+  memory.setFlag(flags.carry,tmp < 0)
+  memory.setLastInstructionClock(2)
+}
+
+export function RET_S_F(state, flag, memory){
+  const check = state?memory.flag(flag):!memory.flag(flag)
+  if(check){
+    memory.setPC(memory.readWord(memory.SP()))
+    memory.setSP(memory.SP()+2)
+    memory.setLastInstructionClock(5)
+  } else {
+    memory.setLastInstructionClock(2)
+  }
+}
+
+export function POP_X_Y(regX, regY, memory){
+  memory.setReg8(regY, memory.readByte(memory.SP()))
+  memory.setReg8(regX, memory.readByte(memory.SP()+1))
+  memory.setSP(memory.SP()+2)
+  memory.setLastInstructionClock(3)
+}
+
+export function JP_S_F_a16(state, flag, memory){
+  const check = state?memory.flag(flag):!memory.flag(flag)
+  if(check){
+    memory.setPC(memory.readWord(memory.PC()))
+    memory.setLastInstructionClock(4)
+  } else {
+    memory.setLastInstructionClock(3)
+  }
+}
+
+export function JP_a16(memory){
+  memory.setPC(memory.readWord(memory.PC()))
+  memory.setLastInstructionClock(3)
+}
+
+export function CALL_S_F_a16(state, flag, memory){
+  const check = state?memory.flag(flag):!memory.flag(flag)
+  if (check) {
+    const tmppc = memory.readWord(memory.PC())
+    memory.setPC(memory.PC() + 2)
+    memory.setSP(memory.SP() - 1)
+    memory.writeByte(memory.SP(), memory.PC() >> 8)
+    memory.setSP(memory.SP() - 1)
+    memory.writeByte(memory.SP(), memory.PC())
+    memory.setPC(tmppc)
+    memory.setLastInstructionClock(6)
+  }
+  else {
+    memory.setPC(memory.PC() + 2)
+    memory.setLastInstructionClock(2)
+  }
+}
+
+export function PUSH_X_Y(regX, regY, memory){
+  memory.setSP(memory.SP() - 1)
+  memory.writeByte(memory.SP(), memory.reg8(regX))
+  memory.setSP(memory.SP() - 1)
+  memory.writeByte(memory.SP(), memory.reg8(regY))
+  memory.setLastInstructionClock(4)
+}
+
+export function ADD_X_d8(regX, memory){
+  const sum = memory.reg8(regX) + memory.readByte(memory.PC())
+  memory.setPC(memory.PC() + 1)
+  memory.setFlag(flags.halfCarry, (sum & 0xF) < (memory.reg8(regX) & 0xF))
+  memory.setFlag(flags.carry, (sum > 0xFF))
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.subtract, false)
+  memory.setLastInstructionClock(2)
+}
+
+export function RST_p(p,memory){
+  memory.setSP(memory.SP() - 1)
+  memory.writeByte(memory.SP(), memory.PC() >> 8)
+  memory.setSP(memory.SP() - 1)
+  memory.writeByte(memory.SP(), memory.PC())
+  memory.setPC(p)
+  memory.setLastInstructionClock(4)
+}
+
+export function RET(memory){
+  memory.setPC((memory.readByte((memory.SP() + 1) & 0xFFFF) << 8) | memory.readByte(memory.SP()))
+  memory.setSP(memory.SP() + 2)
+  memory.setLastInstructionClock(4)
+}
+
+export function PREFIX_CB(prefixedOpcodes, memory){
+  const opcode = memory.readByte(memory.PC())
+  memory.setPC(memory.PC() + 1)
+  prefixedOpcodes[opcode](memory)
+  memory.setLastInstructionClock(memory.lastInstructionClock() + 1)
+}
+
+export function CALL_a16(memory){
+  const tmppc = memory.readWord(memory.PC())
+  memory.setPC(memory.PC() + 2)
+  memory.setSP(memory.SP() - 1)
+  memory.writeByte(memory.SP(), memory.PC() >> 8)
+  memory.setSP(memory.SP() - 1)
+  memory.writeByte(memory.SP(), memory.PC())
+  memory.setPC(tmppc)
+  memory.setLastInstructionClock(6)
+}
+
+export function ADC_X_d8(regX, memory){
+  const tmp = memory.readByte(memory.PC())
+  memory.setPC(memory.PC() + 1)
+  const sum = memory.reg8(regX) + tmp + ((memory.flag(flags.carry)) ? 1 : 0)
+  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) + (tmp & 0xF) + ((memory.flag(flags.carry)) ? 1 : 0)) > 0xF)
+  memory.setFlag(flags.carry, (sum > 0xFF))
+  memory.setReg8(regX, sum)
+  memory.setFlag(flags.zero, memory.reg8(regX) === 0)
+  memory.setFlag(flags.subtract, false)
+  memory.setLastInstructionClock(2)
+}
