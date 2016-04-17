@@ -9,6 +9,7 @@ function logState(memory){
     'linst:',memory.lastInstructionClock(),
     'PC:',memory.PC().toString(16).toUpperCase(),
     'SP:', memory.SP().toString(16).toUpperCase(),
+    'HL:', memory.HL().toString(16).toUpperCase(),
     'A:',memory.reg8(reg8.A).toString(16).toUpperCase(),
     'B:',memory.reg8(reg8.B).toString(16).toUpperCase(),
     'C:',memory.reg8(reg8.C).toString(16).toUpperCase(),

@@ -34,8 +34,8 @@ export const reg8 = {
   H : 0x10005,
   L : 0x10006,
   F : 0x10007,
-  P : 0x10008,
-  S : 0x10009
+  S : 0x10008,
+  P : 0x10009
 }
 
 export const flags = {
@@ -52,6 +52,7 @@ export const flags = {
 
 const SPMapping = 0x10008
 const PCMapping = 0x1000A
+const HLMapping = 0x10005
 
 const lastInstructionClockMapping = 0x1000C
 const clockMapping = 0x1000D
@@ -86,18 +87,21 @@ function createMemory(buffer){
       byteView[addr] = value
     },
     PC(){
-      return (byteView[PCMapping]<<8)+byteView[PCMapping+1]
+      return byteView[PCMapping]+(byteView[PCMapping+1]<<8)
     },
     setPC(value){
-      byteView[PCMapping] = (value>>8)
-      byteView[PCMapping+1] = value
+      byteView[PCMapping] = value
+      byteView[PCMapping+1] = (value>>8)
     },
     SP(){
       return byteView[SPMapping]+(byteView[SPMapping+1] << 8)
     },
     setSP(value){
-      byteView[SPMapping] = (value>>8)
-      byteView[SPMapping+1] = value
+      byteView[SPMapping] = value
+      byteView[SPMapping+1] = (value>>8)
+    },
+    HL(){
+      return byteView[HLMapping]+(byteView[HLMapping+1] << 8)
     },
     clock(){
       return (byteView[clockMapping]*16777216)+

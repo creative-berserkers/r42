@@ -152,6 +152,7 @@ export const OperationCodesMapping = [
   opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.C),
   opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.D),
   opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.E),
+  opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.H),
   opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.L),
   opcodes.ADC_X_mYZ.bind(undefined, reg8.A, reg8.H, reg8.L),
   opcodes.ADC_X_Y.bind(undefined, reg8.A, reg8.A),

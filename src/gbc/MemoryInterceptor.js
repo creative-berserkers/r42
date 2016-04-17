@@ -68,6 +68,9 @@ function createMemoryInterceptor(memory){
     setSP(value){
       interceptedMemory.setSP(value)
     },
+    HL(){
+      return interceptedMemory.HL()
+    },
     clock(){
       return interceptedMemory.clock()
     },
