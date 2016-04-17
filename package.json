@@ -9,7 +9,8 @@
     "start": "babel-node devServer.js",
     "debug": "babel-node-debug devServer.js",
     "lint": "eslint src",
-    "test": "mocha -w --compilers js:babel-core/register --recursive test"
+    "test": "mocha -w --compilers js:babel-core/register --recursive test",
+    "test-cpu": "mocha -w --compilers js:babel-core/register test/gbc/CPUTest"
   },
   "repository": {
     "type": "git",

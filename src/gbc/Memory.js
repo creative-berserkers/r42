@@ -34,8 +34,8 @@ export const reg8 = {
   H : 0x10005,
   L : 0x10006,
   F : 0x10007,
-  S : 0x10008,
-  P : 0x10009
+  P : 0x10008,
+  S : 0x10009
 }
 
 export const flags = {
@@ -46,11 +46,12 @@ export const flags = {
   stop: [0x10011,0x80],
   halt: [0x10011, 0x40],
   illegal: [0x10011, 0x20],
-  ime: [0x10011, 0x10]
+  ime: [0x10011, 0x10],
+  isOutOfBios:[0x10011, 0x08]
 }
 
-const SPMapping = 0x00008
-const PCMapping = 0x0000A
+const SPMapping = 0x10008
+const PCMapping = 0x1000A
 
 const lastInstructionClockMapping = 0x1000C
 const clockMapping = 0x1000D
@@ -92,7 +93,7 @@ function createMemory(buffer){
       byteView[PCMapping+1] = value
     },
     SP(){
-      return (byteView[SPMapping]<<8)+byteView[SPMapping+1]
+      return byteView[SPMapping]+(byteView[SPMapping+1] << 8)
     },
     setSP(value){
       byteView[SPMapping] = (value>>8)
@@ -140,5 +141,9 @@ export default {
   createMemory,
   createEmptyMemory(){
     return createMemory(new ArrayBuffer(expectedBufferSize))
+  },
+  createMemoryWithRom(rom){
+    const memory = new ArrayBuffer(expectedBufferSize)
+    return createMemory(memory)
   }
 }

@@ -1,8 +1,8 @@
 import * as opcodes from './OperationCodes'
 import {reg8, flags} from './Memory'
-import prefixedOpcodes from './PrefixedOperationCodesMapping'
+import {PrefixedOperationCodesMapping as prefixedOpcodes} from './PrefixedOperationCodesMapping'
 
-export default OperationCodesMapping = [
+export const OperationCodesMapping = [
   //0X00
   opcodes.NOP,
   opcodes.LD_XY_d16.bind(undefined, reg8.B, reg8.C),
@@ -57,7 +57,7 @@ export default OperationCodesMapping = [
   //0x30
   opcodes.JR_SF_r8.bind(undefined, false, flags.carry),
   opcodes.LD_XY_d16.bind(undefined, reg8.S, reg8.P),
-  opcodes.LD_N_mXY_Z.bind(undefined, -1, reg8.H, reg8.L),
+  opcodes.LD_N_mXY_Z.bind(undefined, -1, reg8.H, reg8.L, reg8.A),
   opcodes.INC_XY.bind(undefined, reg8.S, reg8.P),
   opcodes.INC_mXY.bind(undefined, reg8.H, reg8.L),
   opcodes.DEC_mXY.bind(undefined, reg8.H, reg8.L),

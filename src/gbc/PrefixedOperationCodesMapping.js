@@ -1,7 +1,7 @@
 import * as opcodes from './PrefixedOperationCodes'
 import {reg8} from './Memory'
 
-export default PrefixedOperationCodesMapping = [
+export const PrefixedOperationCodesMapping = [
   //0x00
   opcodes.RLC_X.bind(undefined,reg8.B),
   opcodes.RLC_X.bind(undefined,reg8.C),
