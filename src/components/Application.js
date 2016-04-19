@@ -1,11 +1,12 @@
 import {element} from 'deku'
+import GBC from './GBC'
 
 export default {
   render() {
     return (
         <div>
-          <p>Hello World!</p>
-          <button>Click Me</button>
+          <p>GBC Emulator</p>
+          <GBC></GBC>
         </div>
     )
   }

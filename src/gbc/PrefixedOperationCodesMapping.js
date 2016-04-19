@@ -29,7 +29,6 @@ export const PrefixedOperationCodesMapping = [
   opcodes.RL_mXY.bind(undefined, reg8.H, reg8.L),
   opcodes.RL_X.bind(undefined, reg8.A),
   opcodes.RR_X.bind(undefined, reg8.B),
-  opcodes.RR_X.bind(undefined,reg8.B),
   opcodes.RR_X.bind(undefined,reg8.C),
   opcodes.RR_X.bind(undefined,reg8.D),
   opcodes.RR_X.bind(undefined,reg8.E),

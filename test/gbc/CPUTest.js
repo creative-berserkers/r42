@@ -31,11 +31,11 @@ describe('CPU test', ()=>{
     console.log('Init memory')
     logState(memory)
     console.log('Starting simulation')
-    for(let i=0;i<4;++i){
-      console.log('Simulation step:',i)
-      console.log('Next opcode is[',memory.readByte( memory.PC() ).toString(16),']:',opcodes[memory.readByte( memory.PC() )].name)
+    let i=0;
+    while(!memory.flag(flags.isOutOfBios)){
+      console.log(i++,': Next opcode is[',memory.readByte( memory.PC() ).toString(16),']:',opcodes[memory.readByte( memory.PC() )].name)
       step(opcodes, memory)
       logState(memory)
     }
   })
-})
+});

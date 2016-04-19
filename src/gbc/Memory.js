@@ -26,23 +26,23 @@ stop flag: 10011
 const expectedBufferSize = 0x10013
 
 export const reg8 = {
-  A : 0x10000,
-  B : 0x10001,
-  C : 0x10002,
-  D : 0x10003,
-  E : 0x10004,
-  H : 0x10005,
-  L : 0x10006,
-  F : 0x10007,
-  S : 0x10008,
-  P : 0x10009
+  A : [0x10000,'A'],
+  B : [0x10001,'B'],
+  C : [0x10002,'C'],
+  D : [0x10003,'D'],
+  E : [0x10004,'E'],
+  H : [0x10005,'H'],
+  L : [0x10006,'L'],
+  F : [0x10007,'F'],
+  S : [0x10008,'S'],
+  P : [0x10009,'P']
 }
 
 export const flags = {
-  zero : [reg8.F, 0x80],
-  subtract: [reg8.F, 0x40],
-  halfCarry: [reg8.F, 0x20],
-  carry: [reg8.F, 0x10],
+  zero : [reg8.F[0], 0x80],
+  subtract: [reg8.F[0], 0x40],
+  halfCarry: [reg8.F[0], 0x20],
+  carry: [reg8.F[0], 0x10],
   stop: [0x10011,0x80],
   halt: [0x10011, 0x40],
   illegal: [0x10011, 0x20],
@@ -77,31 +77,31 @@ function createMemory(buffer){
       return (byteView[addr]<<8) + byteView[addr+1]
     },
     writeWord(addr, value){
-      byteView[addr] = value>>8
+      byteView[addr] = (value>>8)
       byteView[addr+1]=value
     },
     reg8(addr){
-      return byteView[addr]
+      return byteView[addr[0]]
     },
     setReg8(addr, value){
-      byteView[addr] = value
+      byteView[addr[0]] = value
     },
     PC(){
-      return byteView[PCMapping]+(byteView[PCMapping+1]<<8)
+      return (byteView[PCMapping]<<8)+byteView[PCMapping+1]
     },
     setPC(value){
-      byteView[PCMapping] = value
-      byteView[PCMapping+1] = (value>>8)
+      byteView[PCMapping] = (value>>8)
+      byteView[PCMapping+1] = value
     },
     SP(){
-      return byteView[SPMapping]+(byteView[SPMapping+1] << 8)
+      return (byteView[SPMapping]<< 8)+byteView[SPMapping+1]
     },
     setSP(value){
-      byteView[SPMapping] = value
-      byteView[SPMapping+1] = (value>>8)
+      byteView[SPMapping] = (value>>8)
+      byteView[SPMapping+1] = value
     },
     HL(){
-      return byteView[HLMapping]+(byteView[HLMapping+1] << 8)
+      return (byteView[HLMapping]<< 8) + byteView[HLMapping+1]
     },
     clock(){
       return (byteView[clockMapping]*16777216)+
