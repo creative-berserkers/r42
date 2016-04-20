@@ -21,16 +21,17 @@ const onShowMemoryDumpClicked = (dispatch, context) => {
 }
 
 const formatHex = (val) => {
-  return val.toString(16).toUpperCase()
+  let num = val.toString(16).toUpperCase()
+  return ("0" + num).slice(-2)
 }
 
 const printMemory = (memory) => {
   let rows = []
-  for(let i=0; i<256;++i){
+  for(let i=0; i<Memory.expectedBufferSize;++i){
     if(i === memory.PC()){
-      rows.push(<b id='{i}'>{formatHex(memory.readByte(i))}</b>)
+      rows.push('<b class=\'pc-counter\'>'+formatHex(memory.readByte(i))+'</b>')
     } else {
-      rows.push(<span id={i}>{formatHex(memory.readByte(i))}</span>)
+      rows.push(formatHex(memory.readByte(i)))
     }
   }
   return rows
@@ -45,10 +46,23 @@ export default {
           <button onClick={onNextCycleClicked(dispatch)}>Next Step</button>
         </div>
         <div>
+          Speed: <input></input>
+          <button onClick={onPlayClicked(dispatch)}>Play</button>
+          <button onClick={onStopClicked(dispatch)}>Stop</button>
+        </div>
+        <div>
           <table>
             <tr>
               <td>Clock:{context.currentMemory.clock()}</td>
               <td>last instr took:{context.currentMemory.lastInstructionClock()}</td>
+            </tr>
+            <tr>
+              <td>GPU Clock:{context.currentMemory.GPUClock()}</td>
+              <td>GPU Mode:{context.currentMemory.GPUMode()}</td>
+            </tr>
+            <tr>
+              <td>GPU Line:{context.currentMemory.GPULine()}</td>
+              <td>--</td>
             </tr>
             <tr>
               <td>PC:0x{formatHex(context.currentMemory.PC())}</td>
@@ -73,7 +87,7 @@ export default {
           </table>
           <div>
             <button onClick={onShowMemoryDumpClicked(dispatch, context)}>Show memory dump {context.showMemoryDump === true? 'ON' : 'OFF'}</button>
-            <div class="memoryblock">{ (context.showMemoryDump === true) ? printMemory(context.currentMemory) : <span />}</div>
+            <div class="memoryblock" innerHTML={(context.showMemoryDump === true) ? printMemory(context.currentMemory) : ''}></div>
           </div>
         </div>
       </div>

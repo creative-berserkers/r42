@@ -9,11 +9,19 @@ const initialState = {
     showMemoryDump: false
 }
 
+const onScanLine(memory) =>{
+  console.log('scanLine')
+}
+
+const onVBlank = (memory)=>{
+  console.log('vblank')
+}
+
 export default function GBCReducer(state = initialState, action) {
     switch (action.type) {
       case STEP_FORWARD_CYCLE:
         const newMemory = state.currentMemory.clone()
-        step(opcodes, newMemory)
+        step(opcodes, newMemory, onScanLine, onVBlank)
         return Object.assign({}, state,{
             history : [...state.history, state.currentMemory],
             currentMemory: newMemory

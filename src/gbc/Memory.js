@@ -23,7 +23,7 @@ clock : 1000D to 10010
 stop flag: 10011
  */
 
-const expectedBufferSize = 0x10013
+const expectedBufferSize = 0x10019
 
 export const reg8 = {
   A : [0x10000,'A'],
@@ -58,6 +58,10 @@ const lastInstructionClockMapping = 0x1000C
 const clockMapping = 0x1000D
 
 const IRQEnableDelayMapping = 0x10012
+
+const gpuClockMapping = 0x10013
+const gpuModeMapping = 0x10017
+const gpuLineMapping = 0x10018
 
 function createMemory(buffer){
   if(buffer.byteLength != expectedBufferSize){
@@ -118,11 +122,35 @@ function createMemory(buffer){
       byteView[clockMapping+2] = (value>>8)
       byteView[clockMapping+3] = (value)
     },
+    GPUClock(){
+        return (byteView[gpuClockMapping]*16777216)+
+          (byteView[gpuClockMapping+1]*65536)+
+          (byteView[gpuClockMapping+2]*256)+
+          (byteView[gpuClockMapping+3])
+    },
+    setGPUClock(value){
+        byteView[gpuClockMapping] = (value>>24)
+        byteView[gpuClockMapping+1] = (value>>16)
+        byteView[gpuClockMapping+2] = (value>>8)
+        byteView[gpuClockMapping+3] = (value)
+    },
     lastInstructionClock(){
       return byteView[lastInstructionClockMapping]
     },
     setLastInstructionClock(value){
       byteView[lastInstructionClockMapping] = value
+    },
+    GPUMode(){
+      return byteView[gpuModeMapping]
+    },
+    setGPUMode(mode){
+      byteView[gpuModeMapping] = mode
+    },
+    GPULine(){
+      return byteView[gpuLineMapping]
+    },
+    setGPULine(line){
+      byteView[gpuLineMapping] = line
     },
     IRQEnableDelay(){
       return byteView[IRQEnableDelayMapping]

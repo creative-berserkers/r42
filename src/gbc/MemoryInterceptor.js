@@ -80,11 +80,29 @@ function createMemoryInterceptor(memory){
     setClock(value){
       interceptedMemory.setClock(value)
     },
+    GPUClock(){
+        return interceptedMemory.clock()
+    },
+    setGPUClock(value){
+        interceptedMemory.setClock(value)
+    },
     lastInstructionClock(){
       return interceptedMemory.lastInstructionClock()
     },
     setLastInstructionClock(value){
       interceptedMemory.setLastInstructionClock(value)
+    },
+    GPUMode(){
+      return interceptedMemory.GPUMode()
+    },
+    setGPUMode(mode){
+      interceptedMemory.setGPUMode(mode)
+    },
+    GPULine(){
+      return interceptedMemory.GPULine()
+    },
+    setGPULine(line){
+      interceptedMemory.setGPULine(line)
     },
     IRQEnableDelay(){
       return interceptedMemory.IRQEnableDelay
