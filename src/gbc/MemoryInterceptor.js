@@ -23,6 +23,9 @@ function createMemoryInterceptor(memory){
   const interceptedMemory = memory
 
   const interceptor = {
+    clone(){
+        return createMemoryInterceptor(memory.clone())
+    },
     readByte(addr){
       if ((addr & 0xF000) === 0x0000) {
         if (!interceptedMemory.flag(flags.isOutOfBios)) { //read bios?
@@ -96,13 +99,14 @@ function createMemoryInterceptor(memory){
       interceptedMemory.setFlag(flag, state)
     }
   }
-  
+
   return interceptor
 }
 
 export {reg8, flags} from './Memory'
 
 export default {
+  expectedBufferSize: Memory.expectedBufferSize,
   createEmptyMemory(){
     return createMemoryInterceptor(Memory.createEmptyMemory())
   },

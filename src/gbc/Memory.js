@@ -67,6 +67,9 @@ function createMemory(buffer){
   const byteView = new Uint8Array(buffer, 0, buffer.byteLength)
 
   return {
+    clone(){
+        return createMemory(buffer.slice(0));
+    },
     readByte(addr){
       return byteView[addr]
     },

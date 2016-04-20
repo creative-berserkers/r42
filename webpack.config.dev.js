@@ -19,9 +19,9 @@ module.exports = {
   ],
   module: {
     loaders: [{
-      test: /\.jsx?$/,
+      test: /\.js$/,
       loader: 'babel',
-      include: path.join(__dirname, 'src/components'),
+      include: path.join(__dirname, 'src'),
       query: {
         presets: ['es2015'],
         plugins: [['transform-react-jsx', {pragma: 'element'}]]
