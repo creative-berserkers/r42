@@ -6,14 +6,14 @@ import GBCReducer from '../reducers/GBCReducer'
 let canvas = document.getElementById('display')
 
 const canvasRenderer = store => next => action => {
-  console.log('dispatching', action)
+  //console.log('dispatching', action)
   let result = next(action)
-  console.log('next state', store.getState())
+  //console.log('next state', store.getState())
   // render to canvas
-  var ctx = canvas.getContext("2d");
+  //var ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "green";
-  ctx.fillRect(10, 10, 100, 100);
+  //ctx.fillStyle = "green";
+  //ctx.fillRect(10, 10, 100, 100);
 
   return result
 }

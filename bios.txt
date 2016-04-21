@@ -1,5 +1,5 @@
 ## m[##]
-00   31   LD SP 0xFFFE
+00   31   LD SP 0xFFFE       
 01   FE 
 02   FF 
 03   AF   XOR A A
@@ -32,14 +32,14 @@
 1E   FC   
 1F   E0   LDH (0xFF47) A
 20   47 
-21   11 
-22   04 
+21   11   LD DE 0x0104
+22   04   
 23   01 
-24   21 
+24   21   LD HL 0x8010
 25   10 
 26   80 
-27   1A 
-28   CD 
+27   1A   LD A (DE)
+28   CD   CALL 0x0096
 29   95 
 2A   00 
 2B   CD 
@@ -63,7 +63,7 @@
 3D   05 
 3E   20 
 3F   F9 
-40   3E 
+40   3E
 41   19 
 42   EA 
 43   10 
@@ -97,13 +97,13 @@
 5F   04
 60   1E 
 61   02 
-62   0E 
+62   0E LD C 0C
 63   0C 
-64   F0 
+64   F0 LDH A 0xFF44
 65   44 
-66   FE 
+66   FE CP 0x90
 67   90 
-68   20 
+68   20 JR NZ 0xFA           #jump if zero flag is not zero to PC - 5 => 0x64 
 69   FA 
 6A   0D 
 6B   20 
@@ -149,13 +149,13 @@
 93   18
 94   CB
 95   4F
-96   06
+96   06   LD B 0x04
 97   04
-98   C5
-99   CB
+98   C5   PUSH BC
+99   CB   CB_RL C
 9A   11
-9B   17
-9C   C1
+9B   17   RLA
+9C   C1   RET NZ
 9D   CB
 9E   11
 9F   17

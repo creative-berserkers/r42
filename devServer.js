@@ -13,6 +13,10 @@ var app = express()
 app.use(dev(compiler, {noInfo: true, publicPath: config.output.publicPath}))
 app.use(hot(compiler))
 
+app.get('/testrom', function(req, res){
+  res.sendFile(path.join(__dirname, 'opus5.gb'));
+})
+
 app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, 'index.html'));
 })

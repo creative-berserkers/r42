@@ -1,7 +1,7 @@
 export const STEP_FORWARD_CYCLE = 'STEP_FORWARD_CYCLE'
 export function stepForwardCycle(){
   return {
-    type: STEP_FORWARD_CYCLE
+    type: STEP_FORWARD_CYCLE,
   }
 }
 
@@ -17,5 +17,45 @@ export function showMemoryDump(flag){
   return {
     type : SHOW_MEMORY_DUMP,
     flag: flag
+  }
+}
+
+export const PLAY = 'PLAY'
+export function play(speed){
+  return {
+    type : PLAY,
+    speed : speed
+  }
+}
+
+export const STOP = 'STOP'
+export function stop(speed){
+  return {
+    type : STOP,
+    speed: speed
+  }
+}
+
+export const CHANGE_SPEED = 'CHANGE_SPEED'
+export function changeSpeed(speed){
+  return {
+    type: CHANGE_SPEED,
+    speed: speed
+  }
+}
+
+export const CHANGE_THRESHOLD = 'CHANGE_THRESHOLD'
+export function changeThreshold(threshold){
+  return {
+    type: CHANGE_THRESHOLD,
+    threshold: threshold
+  }
+}
+
+export const LOAD_ROM = 'LOAD_ROM'
+export function loadROM(data){
+  return {
+    type : LOAD_ROM,
+    data : data
   }
 }

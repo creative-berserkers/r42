@@ -4,26 +4,28 @@ Memory contains 65,536 bytes addressable from 00000 to 0FFFF
 
 Registers are located at addresses from 10000 up
 
-register A : 10000 to 10000
-register B : 10001 to 10001
-register C : 10002 to 10002
-register D : 10003 to 10003
-register E : 10004 to 10004
-register H : 10005 to 10005
-register L : 10006 to 10006
-register F : 10007 to 10007
+register A : 18000 to 18000
+register B : 18001 to 18001
+register C : 18002 to 18002
+register D : 18003 to 18003
+register E : 18004 to 18004
+register H : 18005 to 18005
+register L : 18006 to 18006
+register F : 18007 to 18007
 
-register PC: 10008 to 10009
-register SP: 1000A to 1000B
+register PC: 18008 to 18009
+register SP: 1800A to 1800B
 
-last instr clock: 1000C to 1000C
+last instr clock: 1800C to 1800C
 
-clock : 1000D to 10010
+clock : 1800D to 18010
 
-stop flag: 10011
+stop flag: 18011
  */
 
-const expectedBufferSize = 0x10019
+const expectedBufferSize = 0x10046
+const tilesetBufferSize = 0x8000
+const screenBufferSize = 0x16800
 
 export const reg8 = {
   A : [0x10000,'A'],
@@ -47,7 +49,12 @@ export const flags = {
   halt: [0x10011, 0x40],
   illegal: [0x10011, 0x20],
   ime: [0x10011, 0x10],
-  isOutOfBios:[0x10011, 0x08]
+  isOutOfBios:[0x10011, 0x08],
+
+  switchbg:[0x10022, 0x80],
+  bgmap:[0x10022, 0x40],
+  bgtile:[0x10022, 0x20],
+  switchlcd:[0x10022, 0x10]
 }
 
 const SPMapping = 0x10008
@@ -62,17 +69,29 @@ const IRQEnableDelayMapping = 0x10012
 const gpuClockMapping = 0x10013
 const gpuModeMapping = 0x10017
 const gpuLineMapping = 0x10018
+const gpuScrollXMapping = 0x10019
+const gpuScrollYMapping = 0x10020
+const gpuBGTileMapping = 0x10021
+const gpuPalleteMapping = 0x10030
 
-function createMemory(buffer){
+function createMemory(canvas, buffer, tilesetBuffer, screenBuffer){
   if(buffer.byteLength != expectedBufferSize){
     throw new Error('Memory must have size equal to 0x10010 bytes')
   }
 
   const byteView = new Uint8Array(buffer, 0, buffer.byteLength)
+  const tilesetByteView = new Uint8Array(tilesetBuffer, 0, tilesetBuffer.byteLength)
+  const screenByteView = screenBuffer
+
+  function copyImageData(ctx, src){
+      var dst = ctx.createImageData(src.width, src.height);
+      dst.data.set(src.data);
+      return dst;
+  }
 
   return {
     clone(){
-        return createMemory(buffer.slice(0));
+        return createMemory(canvas, buffer.slice(0), tilesetBuffer.slice(0), copyImageData(canvas, screenByteView));
     },
     readByte(addr){
       return byteView[addr]
@@ -152,11 +171,50 @@ function createMemory(buffer){
     setGPULine(line){
       byteView[gpuLineMapping] = line
     },
+    GPUScrollX(){
+      return byteView[gpuScrollXMapping]
+    },
+    setGPUScrollX(value){
+      byteView[gpuScrollXMapping] = value
+    },
+    GPUScrollY(){
+      return byteView[gpuScrollYMapping]
+    },
+    setGPUScrollY(value){
+      byteView[gpuScrollYMapping] = value
+    },
+    GPUPallete(index){
+      return [byteView[gpuPalleteMapping+(index*4)],
+              byteView[gpuPalleteMapping+(index*4)+1],
+              byteView[gpuPalleteMapping+(index*4)+2],
+              byteView[gpuPalleteMapping+(index*4)+3]]
+    },
+    setGPUPallete(index, value){
+      byteView[gpuPalleteMapping+(index*4)] = value[0]
+      byteView[gpuPalleteMapping+(index*4)+1] = value[1]
+      byteView[gpuPalleteMapping+(index*4)+2] = value[2]
+      byteView[gpuPalleteMapping+(index*4)+3] = value[3]
+    },
     IRQEnableDelay(){
       return byteView[IRQEnableDelayMapping]
     },
     setIRQEnableDelay(value){
       byteView[IRQEnableDelayMapping] = value
+    },
+    tilesetData(tile, x, y){
+      return tilesetByteView[(tile*64)+(y*8)+x]
+    },
+    setTilesetData(tile, x, y, val){
+      tilesetByteView[(tile*64)+(y*8)+x] = val
+    },
+    screenData(index){
+      return screenByteView[index]
+    },
+    setScreenData(index, value){
+      screenByteView[index] = value
+    },
+    screenDataObj(){
+      return screenByteView
     },
     flag(flag){
       return (byteView[flag[0]] & flag[1]) !== 0
@@ -167,6 +225,12 @@ function createMemory(buffer){
       } else {
         byteView[flag[0]] = byteView[flag[0]] & ~flag[1]
       }
+    },
+    loadROM(data){
+      console.log('loading ',data.byteLength, 'bytes')
+      for(let i=0;i<data.byteLength;++i){
+        byteView[i] = data[i]
+      }
     }
   }
 }
@@ -174,11 +238,13 @@ function createMemory(buffer){
 export default {
   expectedBufferSize,
   createMemory,
-  createEmptyMemory(){
-    return createMemory(new ArrayBuffer(expectedBufferSize))
+  createEmptyMemory(canvas){
+    return createMemory(canvas, new ArrayBuffer(expectedBufferSize),new ArrayBuffer(tilesetBufferSize), canvas.createImageData(160, 144))
   },
-  createMemoryWithRom(rom){
+  createMemoryWithRom(canvas, rom){
     const memory = new ArrayBuffer(expectedBufferSize)
-    return createMemory(memory)
+    const tileset = new ArrayBuffer(tilesetBufferSize)
+    const screen = canvas.createImageData(160, 144)
+    return createMemory(canvas, memory,tileset, screen)
   }
 }

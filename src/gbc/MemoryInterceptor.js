@@ -18,6 +18,21 @@ const bios = [
   0x21, 0x04, 0x01, 0x11, 0xA8, 0x00, 0x1A, 0x13, 0xBE, 0x20, 0xFE, 0x23, 0x7D, 0xFE, 0x34, 0x20,
   0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50]
 
+const updateTile = (memory, addr, val) => {
+  	// Work out which tile and row was updated
+	let tile = (addr >> 4) & 511
+	let y = (addr >> 1) & 7
+
+	let sx
+	for(let x = 0; x < 8; x++){
+	    // Find bit index for this pixel
+	    sx = 1 << (7-x);
+	    // Update tile set
+      const val = ((memory.readByte(addr) & sx)   ? 1 : 0) + ((memory.readByte(addr +1) & sx) ? 2 : 0)
+      memory.setTilesetData(tile, x, y, val )
+	}
+}
+
 function createMemoryInterceptor(memory){
 
   const interceptedMemory = memory
@@ -34,16 +49,55 @@ function createMemoryInterceptor(memory){
           else if (interceptedMemory.PC() === 0x0100)
             interceptedMemory.setFlag(flags.isOutOfBios, true)
         }
-      } else if((addr & 0xF000) === 0xE000) { //shadow ram
+      }
+      if((addr & 0xF000) === 0xE000) { //shadow ram
         return interceptedMemory.readByte(addr & 0xDFFF)
-      } else if((addr & 0xFE00) === 0xFE00) {
+      }
+      if((addr & 0xFE00) === 0xFE00) {
         //gpu stuff
-      } else if((addr & 0xFF00) === 0xFF00 && addr >= 0xFF80) {
+      }
+      if((addr & 0xFF00) === 0xFF00) {
         //io stuff
+        if(addr === 0xFF40){
+            return (memory.flag(flags.switchlcd)? 0x01:0x00) |
+              (memory.flag(flags.bgmap) ? 0x08 : 0x00) |
+              (memory.flag(flags.bgtile) ? 0x10 : 0x00) |
+              (memory.flag(flags.switchlcd) ? 0x80 : 0x00)
+        } else if(addr === 0xFF42) {
+            return memory.GPUScrollY()
+        } else if(addr === 0xFF43){
+            return memory.GPUScrollX()
+        } else if(addr === 0xFF44){
+            console.log('returning gpu line', memory.GPULine())
+            return memory.GPULine()
+        }
       }
       return interceptedMemory.readByte(addr)
     },
     writeByte(addr, value){
+      if((addr & 0xF000) === 0x8000 || (addr & 0xF000) === 0x9000){
+        updateTile(interceptedMemory, addr, value)
+      } else if((addr & 0xFF00) === 0xFF00){
+        if(addr === 0xFF40){
+          memory.setFlag(flags.switchbg, (value & 0x01) ? true : false)
+          memory.setFlag(flags.bgmap, (value & 0x08) ? true : false)
+          memory.setFlag(flags.bgtile, (value & 0x10) ? true : false)
+          memory.setFlag(flags.switchlcd, (value & 0x80) ? true : false)
+        } else if(addr === 0xFF42){
+          memory.setGPUScrollY(value)
+        } else if(addr === 0xFF43){
+          memory.setGPUScrollX(value)
+        } else if(addr === 0xFF47){
+          for(let i=0; i < 4; ++i){
+            switch((value >> (i * 2)) & 3){
+              case 0 : memory.setGPUPallete(i, [255,255,255,255]); break
+              case 1 : memory.setGPUPallete(i, [192,192,192,255]); break
+              case 2 : memory.setGPUPallete(i, [96, 96, 96, 255]); break
+              case 3 : memory.setGPUPallete(i, [0, 0, 0, 255]); break
+            }
+          }
+        }
+      }
       interceptedMemory.writeByte(addr, value)
     },
     readWord(addr){
@@ -81,10 +135,10 @@ function createMemoryInterceptor(memory){
       interceptedMemory.setClock(value)
     },
     GPUClock(){
-        return interceptedMemory.clock()
+        return interceptedMemory.GPUClock()
     },
     setGPUClock(value){
-        interceptedMemory.setClock(value)
+        interceptedMemory.setGPUClock(value)
     },
     lastInstructionClock(){
       return interceptedMemory.lastInstructionClock()
@@ -104,17 +158,59 @@ function createMemoryInterceptor(memory){
     setGPULine(line){
       interceptedMemory.setGPULine(line)
     },
+    GPUScrollX(){
+      return interceptedMemory.GPUScrollX()
+    },
+    setGPUScrollX(value){
+      interceptedMemory.setGPUScrollX(value)
+    },
+    GPUScrollY(){
+      return interceptedMemory.GPUScrollY()
+    },
+    setGPUScrollY(value){
+      interceptedMemory.setGPUScrollY(value)
+    },
+    GPUBGTile(){
+      return interceptedMemory.GPUBGTile()
+    },
+    GPUPallete(index){
+      return interceptedMemory.GPUPallete(index)
+    },
+    setGPUPallete(index, value){
+      interceptedMemory.setGPUPallete(index, value)
+    },
+    setGPUBGTile(value){
+      interceptedMemory.setGPUBGTile(value)
+    },
     IRQEnableDelay(){
       return interceptedMemory.IRQEnableDelay
     },
     setIRQEnableDelay(value){
       interceptedMemory.setIRQEnableDelay(value)
     },
+    tilesetData(tile, x, y){
+      return interceptedMemory.tilesetData(tile, x, y)
+    },
+    setTilesetData(tile, x, y,val){
+      interceptedMemory.setTilesetData(tile, x, y, val)
+    },
+    screenData(index){
+      return interceptedMemory.screenData(index)
+    },
+    setScreenData(index, value){
+      interceptedMemory.setScreenData(index, value)
+    },
+    screenDataObj(){
+      return interceptedMemory.screenDataObj()
+    },
     flag(flag){
       return interceptedMemory.flag(flag)
     },
     setFlag(flag, state){
       interceptedMemory.setFlag(flag, state)
+    },
+    loadROM(data){
+      interceptedMemory.loadROM(data)
     }
   }
 
@@ -125,10 +221,10 @@ export {reg8, flags} from './Memory'
 
 export default {
   expectedBufferSize: Memory.expectedBufferSize,
-  createEmptyMemory(){
-    return createMemoryInterceptor(Memory.createEmptyMemory())
+  createEmptyMemory(canvas){
+    return createMemoryInterceptor(Memory.createEmptyMemory(canvas))
   },
   createMemoryWithRom(rom){
-    return createMemoryInterceptor(Memory.createMemoryWithRom(rom))
+    return createMemoryInterceptor(Memory.createMemoryWithRom(canvas, rom))
   }
 }

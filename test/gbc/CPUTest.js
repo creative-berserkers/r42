@@ -16,7 +16,7 @@ function logState(memory){
     'D:',memory.reg8(reg8.D).toString(16).toUpperCase(),
     'E:',memory.reg8(reg8.E).toString(16).toUpperCase(),
     'F:',memory.reg8(reg8.F).toString(16).toUpperCase(),
-    'H:',memory.reg8(reg8.H).toString(16).toUpperCase(), 
+    'H:',memory.reg8(reg8.H).toString(16).toUpperCase(),
     'L:',memory.reg8(reg8.L).toString(16).toUpperCase(),
     'f(Z):', memory.flag(flags.zero),
     'f(S):', memory.flag(flags.subtract),
@@ -31,10 +31,9 @@ describe('CPU test', ()=>{
     console.log('Init memory')
     logState(memory)
     console.log('Starting simulation')
-    let i=0;
-    while(!memory.flag(flags.isOutOfBios)){
+    for(let i=0; i< 10 ; ++i){
       console.log(i++,': Next opcode is[',memory.readByte( memory.PC() ).toString(16),']:',opcodes[memory.readByte( memory.PC() )].name)
-      step(opcodes, memory)
+      step(opcodes, memory, ()=>{}, ()=>{})
       logState(memory)
     }
   })
