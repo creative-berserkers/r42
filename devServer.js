@@ -14,7 +14,7 @@ app.use(dev(compiler, {noInfo: true, publicPath: config.output.publicPath}))
 app.use(hot(compiler))
 
 app.get('/testrom', function(req, res){
-  res.sendFile(path.join(__dirname, 'opus5.gb'));
+  res.sendFile(path.join(__dirname, '01-special.gb'));
 })
 
 app.get('*', function(req, res) {

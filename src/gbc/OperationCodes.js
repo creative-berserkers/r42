@@ -18,7 +18,7 @@ export function  LD_mXY_Z(regX, regY, regZ, memory) {
 
 export function INC_XY(regX, regY, memory){
   const tmp = (memory.reg8(regX)<<8) + memory.reg8(regY) + 1
-  memory.setReg8(regX, (tmp<<8))
+  memory.setReg8(regX, (tmp>>8))
   memory.setReg8(regY, tmp)
   memory.setLastInstructionClock(2)
 }
@@ -496,7 +496,7 @@ export function PREFIX_CB(prefixedOpcodes, memory){
   const opcode = memory.readByte(memory.PC())
   memory.setPC(memory.PC() + 1)
   prefixedOpcodes[opcode](memory)
-  memory.setLastInstructionClock(memory.lastInstructionClock() + 1)
+  //memory.setLastInstructionClock(memory.lastInstructionClock())
 }
 
 export function CALL_a16(memory){

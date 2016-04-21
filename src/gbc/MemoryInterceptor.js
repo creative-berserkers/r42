@@ -30,30 +30,19 @@ const renderTileset = (memory, tile) => {
         let y = Math.floor((i/4)/8)
         let x = ((i/4)%8)
         let data = memory.tilesetData(tile, x,y)
-        id.data[i+0] = 255;
-        id.data[i+1] = data;
-        id.data[i+2] = 0;
+        id.data[i+0] = data*85;
+        id.data[i+1] = data*85;
+        id.data[i+2] = data*85;
         id.data[i+3] = 255;
     }
     canvas.putImageData( id, tileX*8, tileY*8)
-
-    /*for(let y=0;y<8;y++){
-      for(let x=0;x<8;x++){
-
-         // only do this once per page
-        var d  = id.data[y*8+x];                        // only do this once per page
-        d[0]   = data;
-        d[1]   = data;
-        d[2]   = data;
-        d[3]   = 255;
-
-      }
-    }*/
   //console.log('rendered tileset');
 }
 
 const updateTile = (memory, addr, val) => {
   	// Work out which tile and row was updated
+  if(addr&1) { addr--; }
+
 	let tile = (addr >> 4) & 511
 	let y = (addr >> 1) & 7
 
@@ -63,9 +52,6 @@ const updateTile = (memory, addr, val) => {
 	    sx = 1 << (7-x);
 	    // Update tile set
       const val = ((memory.readByte(addr) & sx)   ? 1 : 0) + ((memory.readByte(addr +1) & sx) ? 2 : 0)
-      if(val !== 0){
-        //console.log(`writing to tile[${tile}] x[${x}] y[${y}] = ${val}`)
-      }
       memory.setTilesetData(tile, x, y, val )
 	}
   renderTileset(memory, tile)
@@ -81,12 +67,12 @@ function createMemoryInterceptor(memory){
     },
     readByte(addr){
       if ((addr & 0xF000) === 0x0000) {
-        if (!interceptedMemory.flag(flags.isOutOfBios)) { //read bios?
+        /*if (!interceptedMemory.flag(flags.isOutOfBios)) { //read bios?
           if (addr < 0x0100)
             return bios[addr]
           else if (interceptedMemory.PC() === 0x0100)
             interceptedMemory.setFlag(flags.isOutOfBios, true)
-        }
+        }*/
       }
       if((addr & 0xF000) === 0xE000) { //shadow ram
         return interceptedMemory.readByte(addr & 0xDFFF)
@@ -116,8 +102,9 @@ function createMemoryInterceptor(memory){
     },
     writeByte(addr, value){
       if(((addr & 0xF000) === 0x8000) || ((addr & 0xF000) === 0x9000)){
-        //console.log('update tile data')
+        interceptedMemory.writeByte(addr, value)
         updateTile(interceptedMemory, addr, value)
+        return;
       } else if((addr & 0xFF00) === 0xFF00){
         if(addr === 0xFF40){
           memory.setFlag(flags.switchbg, (value & 0x01) ? true : false)

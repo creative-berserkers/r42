@@ -222,7 +222,7 @@ export const OperationCodesMapping = [
   opcodes.PREFIX_CB.bind(undefined, prefixedOpcodes),
   opcodes.CALL_S_F_a16.bind(undefined, true, flags.zero),
   opcodes.CALL_a16,
-  opcodes.ADC_X_d8,
+  opcodes.ADC_X_d8.bind(undefined, reg8.A),
   opcodes.RST_p.bind(undefined, 0x0008),
   //0xD0
   opcodes.RET_S_F.bind(undefined, false, flags.carry),
@@ -231,7 +231,7 @@ export const OperationCodesMapping = [
   opcodes.ILLEGAL,
   opcodes.CALL_S_F_a16.bind(undefined, false, flags.carry),
   opcodes.PUSH_X_Y.bind(undefined, reg8.D, reg8.E),
-  opcodes.SUB_X_d8,
+  opcodes.SUB_X_d8.bind(undefined, reg8.A),
   opcodes.RST_p.bind(undefined, 0x0010),
   opcodes.RET_S_F.bind(undefined, true, flags.carry),
   opcodes.RETI,
@@ -250,7 +250,7 @@ export const OperationCodesMapping = [
   opcodes.PUSH_X_Y.bind(undefined, reg8.H, reg8.L),
   opcodes.AND_X_d8.bind(undefined, reg8.A),
   opcodes.RST_p.bind(undefined, 0x0020),
-  opcodes.ADD_SP_r8.bind(undefined, reg8.S, reg8.P),
+  opcodes.ADD_SP_r8.bind(undefined),
   opcodes.JP_mXY.bind(undefined, reg8.H, reg8.L), //?!
   opcodes.LD_ma16_X.bind(undefined, reg8.A),
   opcodes.ILLEGAL,

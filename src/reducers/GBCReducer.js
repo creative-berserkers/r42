@@ -5,9 +5,22 @@ import {step} from '../gbc/CPU'
 
 let canvas = document.getElementById('display').getContext('2d')
 
+const initMemory = Memory.createEmptyMemory(canvas)
+
+initMemory.setSP(0xFFFE)
+initMemory.setReg8(reg8.A, 0x01)
+initMemory.setReg8(reg8.B, 0x00)
+initMemory.setReg8(reg8.C, 0x13)
+initMemory.setReg8(reg8.D, 0x00)
+initMemory.setReg8(reg8.E, 0xD8)
+initMemory.setReg8(reg8.H, 0x01)
+initMemory.setReg8(reg8.L, 0x4D)
+initMemory.setReg8(reg8.F, 0xB0)
+initMemory.setPC(0x100)
+
 const initialState = {
     history: [],
-    currentMemory : Memory.createEmptyMemory(canvas),
+    currentMemory : initMemory,
     showMemoryDump: false,
     playing: false,
     playingSpeed: 1,
@@ -16,40 +29,40 @@ const initialState = {
 
 const onScanLine = (memory) =>{
   //console.log('scanLine')
-
-  console.log('memory.flag(flags.bgtile)', memory.flag(flags.bgtile))
+  let scrollX = memory.GPUScrollX()
+  let scrollY = memory.GPUScrollY()
 
   let mapOffset = memory.flag(flags.bgmap) ? 0x9C00 : 0x9800
-  mapOffset += (((memory.GPULine() + memory.GPUScrollY()) & 255) >> 3)
+  mapOffset += ( Math.floor(((memory.GPULine() + scrollY) % 256) / 8) * 32)
 
-  let lineOffset = (memory.GPUScrollX() >> 3)
+  let lineOffset = Math.floor((scrollX / 8))
 
-  let y = (memory.GPULine() + memory.GPUScrollY()) & 7
-  let x = memory.GPUScrollX() & 7
+  let y = (memory.GPULine() + scrollY) % 8
+  let x = scrollX % 8
 
   let canvasOffset = memory.GPULine() * 160 * 4
 
   let color
   let tile = memory.readByte(mapOffset + lineOffset)
 
-  if(memory.flag(flags.bgtile) && tile < 128) tile += 256
+  //if(memory.flag(flags.bgtile) && tile < 128) tile += 256
 
   for(let i=0; i<160; ++i){
     let pixel = memory.tilesetData(tile, x, y)
     //console.log('pixel:', pixel)
-    color = 128//memory.GPUPallete(pixel)
-
-    memory.setScreenData(canvasOffset+0, 255)
-    memory.setScreenData(canvasOffset+1, 0)
-    memory.setScreenData(canvasOffset+2, 128)
-    memory.setScreenData(canvasOffset+3, 255)
+    color = memory.GPUPallete(pixel)
+    //let c = (tile < 20) ? 255 : 0;
+    memory.setScreenData(canvasOffset+0, color[0])
+    memory.setScreenData(canvasOffset+1, color[1])
+    memory.setScreenData(canvasOffset+2, color[2])
+    memory.setScreenData(canvasOffset+3, color[3])
     canvasOffset+=4
     x++
     if(x === 8){
       x = 0
-      lineOffset = ((lineOffset + 1) & 31)
-      let tile = memory.readByte(mapOffset + lineOffset)
-      if(memory.flag(flags.bgtile) && tile < 128) tile += 256
+      lineOffset = ((lineOffset + 1) % 32)
+      tile = memory.readByte(mapOffset + lineOffset)
+      //if(memory.flag(flags.bgtile) && tile < 128) tile += 256
     }
   }
 }

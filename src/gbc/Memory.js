@@ -74,13 +74,13 @@ const gpuScrollYMapping = 0x10020
 const gpuBGTileMapping = 0x10021
 const gpuPalleteMapping = 0x10030
 
-function createMemory(canvas, buffer, tilesetBuffer, screenBuffer){
+function createMemory(canvas, buffer, tileset, screenBuffer){
   if(buffer.byteLength != expectedBufferSize){
     throw new Error('Memory must have size equal to 0x10010 bytes')
   }
 
   const byteView = new Uint8Array(buffer, 0, buffer.byteLength)
-  const tilesetByteView = new Uint8Array(tilesetBuffer, 0, tilesetBuffer.byteLength)
+  //const tilesetByteView = new Uint8Array(tilesetBuffer, 0, tilesetBuffer.byteLength)
   const screenByteView = screenBuffer
 
   function copyImageData(ctx, src){
@@ -91,7 +91,7 @@ function createMemory(canvas, buffer, tilesetBuffer, screenBuffer){
 
   return {
     clone(){
-        return createMemory(canvas, buffer.slice(0), tilesetBuffer.slice(0), copyImageData(canvas, screenByteView));
+        return createMemory(canvas, buffer.slice(0), JSON.parse(JSON.stringify(tileset)), copyImageData(canvas, screenByteView));
     },
     readByte(addr){
       return byteView[addr]
@@ -202,10 +202,10 @@ function createMemory(canvas, buffer, tilesetBuffer, screenBuffer){
       byteView[IRQEnableDelayMapping] = value
     },
     tilesetData(tile, x, y){
-      return tilesetByteView[(tile*64)+(y*8)+x]
+      return tileset[tile][x][y]
     },
     setTilesetData(tile, x, y, val){
-      tilesetByteView[(tile*64)+(y*8)+x] = val
+      tileset[tile][x][y] = val
     },
     screenData(index){
       return screenByteView.data[index]
@@ -231,27 +231,31 @@ function createMemory(canvas, buffer, tilesetBuffer, screenBuffer){
       for(let i=0;i<data.byteLength;++i){
         byteView[i] = data[i]
       }
-
-      for(let i=0; i<512; ++i){
-        for(let y=0;y <8 ; y++){
-          for(let x=0; x < 8; x++){
-            tilesetByteView[(i*64)+(y*8)+x] = 255
-          }
-        }
-      }
     }
   }
 }
+
+let createEmptyTileset = () => {
+  let emptyEtileset = [];
+	for(var i = 0; i < 512; i++){
+	    emptyEtileset[i] = [];
+	    for(var j = 0; j < 8; j++){
+	        emptyEtileset[i][j] = [0,0,0,0,0,0,0,0];
+	    }
+	}
+  return emptyEtileset
+}
+
 
 export default {
   expectedBufferSize,
   createMemory,
   createEmptyMemory(canvas){
-    return createMemory(canvas, new ArrayBuffer(expectedBufferSize),new ArrayBuffer(tilesetBufferSize), canvas.createImageData(160, 144))
+    return createMemory(canvas, new ArrayBuffer(expectedBufferSize),createEmptyTileset(), canvas.createImageData(160, 144))
   },
   createMemoryWithRom(canvas, rom){
     const memory = new ArrayBuffer(expectedBufferSize)
-    const tileset = new ArrayBuffer(tilesetBufferSize)
+    const tileset = createEmptyTileset()
     const screen = canvas.createImageData(160, 144)
     return createMemory(canvas, memory,tileset, screen)
   }

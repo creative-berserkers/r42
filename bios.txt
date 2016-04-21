@@ -1,117 +1,117 @@
 ## m[##]
-00   31   LD SP 0xFFFE       
-01   FE 
-02   FF 
+00   31   LD SP 0xFFFE
+01   FE
+02   FF
 03   AF   XOR A A
 04   21   LD HL 0x9FFF
-05   FF 
-06   9F 
+05   FF
+06   9F
 07   32   LD (HL--) A
 08   CB   CB_BIT_7 H
-09   7C 
+09   7C
 0A   20   JR NZ 0x07
-0B   FB 
+0B   FB
 0C   21   LD HL 0xFF26
-0D   26 
-0E   FF 
+0D   26
+0E   FF
 0F   0E   LD C 0x11
-10   11 
+10   11
 11   3E   LD A 0x80
-12   80 
+12   80
 13   32   LD (HL--) A
 14   E2   LD (C) A
 15   0C   INC C
 16   3E   LD A 0xF3
-17   F3 
+17   F3
 18   E2   LD (C) A
 19   32   LD (HL--) A
 1A   3E   LD A 0x77
-1B   77 
+1B   77
 1C   77   LD (HL) A
 1D   3E   LD A 0xFC
-1E   FC   
+1E   FC
 1F   E0   LDH (0xFF47) A
-20   47 
+20   47
 21   11   LD DE 0x0104
-22   04   
-23   01 
+22   04
+23   01
 24   21   LD HL 0x8010
-25   10 
-26   80 
+25   10
+26   80
 27   1A   LD A (DE)
-28   CD   CALL 0x0096
-29   95 
-2A   00 
-2B   CD 
-2C   96 
-2D   00 
-2E   13 
-2F   7B 
-30   FE 
-31   34 
-32   20 
-33   F3 
-34   11 
-35   D8 
-36   00 
-37   06 
-38   08 
-39   1A 
-3A   13 
-3B   22 
-3C   23 
-3D   05 
-3E   20 
-3F   F9 
-40   3E
-41   19 
-42   EA 
-43   10 
-44   99 
-45   21 
-46   2F 
-47   99 
-48   0E 
-49   0C 
-4A   3D 
-4B   28 
-4C   08 
-4D   32 
-4E   0D 
-4F   20 
-50   F9 
-51   2E 
-52   0F 
-53   18 
-54   F3 
-55   67 
-56   3E 
-57   64 
-58   57 
-59   E0 
-5A   42 
-5B   3E 
-5C   91 
-5D   E0 
-5E   40 
+28   CD   CALL 0x0095
+29   95
+2A   00
+2B   CD   CALL 0x0096
+2C   96
+2D   00
+2E   13   INC DE
+2F   7B   LD A E
+30   FE   CP 0x34
+31   34
+32   20   JR NZ 0x0027
+33   F3
+34   11   LD DE 0x00D8
+35   D8
+36   00
+37   06   LD B 0x08
+38   08
+39   1A   LD A (DE)
+3A   13   INC DE
+3B   22   LD (HL++) A
+3C   23   INC HL
+3D   05   DEC B
+3E   20   JR NZ 0x0039
+3F   F9
+40   3E   LD A 0x19
+41   19
+42   EA   LD (0x9910) A
+43   10
+44   99
+45   21   LD HL 0x992F
+46   2F
+47   99
+48   0E   LD C 0x0C
+49   0C
+4A   3D   DEC A
+4B   28   JR Z 0x0055
+4C   08
+4D   32   LD (HL--) A
+4E   0D   DEC C
+4F   20   JR NZ 0x004A
+50   F9
+51   2E   LD L 0x0F
+52   0F
+53   18   JR 0x0048
+54   F3
+55   67   LD H A
+56   3E
+57   64
+58   57
+59   E0
+5A   42
+5B   3E
+5C   91
+5D   E0
+5E   40
 5F   04
-60   1E 
-61   02 
+60   1E
+61   02
 62   0E LD C 0C
-63   0C 
+63   0C
 64   F0 LDH A 0xFF44
-65   44 
+65   44
 66   FE CP 0x90
-67   90 
-68   20 JR NZ 0xFA           #jump if zero flag is not zero to PC - 5 => 0x64 
-69   FA 
-6A   0D 
-6B   20 
-6C   F7 
-6D   1D 
-6E   20 
+67   90
+68   20 JR NZ 0xFA           #jump if zero flag is not zero to PC - 5 => 0x64
+69   FA
+6A   0D
+6B   20
+6C   F7
+6D   1D
+6E   20
 6F   F2
-70   0E 
+70   0E
 71   13
 72   24
 73   7C
@@ -148,26 +148,26 @@
 92   20
 93   18
 94   CB
-95   4F
+95   4F   LD C A
 96   06   LD B 0x04
 97   04
 98   C5   PUSH BC
 99   CB   CB_RL C
 9A   11
 9B   17   RLA
-9C   C1   RET NZ
-9D   CB
+9C   C1   POP BC
+9D   CB   CB_RL C
 9E   11
-9F   17
-A0   05
-A1   20
+9F   17   RL A
+A0   05   DEC B
+A1   20   JR NZ 0x0098
 A2   F5
-A3   22
-A4   23
-A5   22
-A6   23
-A7   C9
-A8   CE
+A3   22   LD (HL++) A
+A4   23   INC HL
+A5   22   LD (HL++) A
+A6   23   INC HL
+A7   C9   RET
+A8   CE                ;Logo start
 A9   ED
 AA   66
 AB   66
@@ -214,7 +214,7 @@ D3   9F
 D4   BB
 D5   B9
 D6   33
-D7   3E
+D7   3E              ;Logo End
 D8   3c
 D9   42
 DA   B9
