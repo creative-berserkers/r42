@@ -37,12 +37,12 @@ const onScanLine = (memory) =>{
   for(let i=0; i<160; ++i){
     let pixel = memory.tilesetData(tile, x, y)
     //console.log('pixel:', pixel)
-    color = memory.GPUPallete(pixel)
+    color = 128//memory.GPUPallete(pixel)
 
-    memory.setScreenData(canvasOffset+0, color[i])
-    memory.setScreenData(canvasOffset+1, color[i])
-    memory.setScreenData(canvasOffset+2, color[i])
-    memory.setScreenData(canvasOffset+3, color[i])
+    memory.setScreenData(canvasOffset+0, 255)
+    memory.setScreenData(canvasOffset+1, 0)
+    memory.setScreenData(canvasOffset+2, 128)
+    memory.setScreenData(canvasOffset+3, 255)
     canvasOffset+=4
     x++
     if(x === 8){
