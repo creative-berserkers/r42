@@ -18,6 +18,40 @@ const bios = [
   0x21, 0x04, 0x01, 0x11, 0xA8, 0x00, 0x1A, 0x13, 0xBE, 0x20, 0xFE, 0x23, 0x7D, 0xFE, 0x34, 0x20,
   0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50]
 
+let canvas = document.getElementById('tileset').getContext('2d')
+
+const renderTileset = (memory, tile) => {
+    let tileY = Math.floor(tile / 32)
+    let tileX = tile % 32
+
+    var id = canvas.createImageData(8,8);
+
+    for (var i = 0; i < id.data.length; i += 4) {
+        let y = Math.floor((i/4)/8)
+        let x = ((i/4)%8)
+        let data = memory.tilesetData(tile, x,y)
+        id.data[i+0] = 255;
+        id.data[i+1] = data;
+        id.data[i+2] = 0;
+        id.data[i+3] = 255;
+    }
+    canvas.putImageData( id, tileX*8, tileY*8)
+
+    /*for(let y=0;y<8;y++){
+      for(let x=0;x<8;x++){
+
+         // only do this once per page
+        var d  = id.data[y*8+x];                        // only do this once per page
+        d[0]   = data;
+        d[1]   = data;
+        d[2]   = data;
+        d[3]   = 255;
+
+      }
+    }*/
+  //console.log('rendered tileset');
+}
+
 const updateTile = (memory, addr, val) => {
   	// Work out which tile and row was updated
 	let tile = (addr >> 4) & 511
@@ -29,8 +63,12 @@ const updateTile = (memory, addr, val) => {
 	    sx = 1 << (7-x);
 	    // Update tile set
       const val = ((memory.readByte(addr) & sx)   ? 1 : 0) + ((memory.readByte(addr +1) & sx) ? 2 : 0)
+      if(val !== 0){
+        //console.log(`writing to tile[${tile}] x[${x}] y[${y}] = ${val}`)
+      }
       memory.setTilesetData(tile, x, y, val )
 	}
+  renderTileset(memory, tile)
 }
 
 function createMemoryInterceptor(memory){
@@ -54,6 +92,7 @@ function createMemoryInterceptor(memory){
         return interceptedMemory.readByte(addr & 0xDFFF)
       }
       if((addr & 0xFE00) === 0xFE00) {
+        //console.log('unsupported read', addr.toString(16))
         //gpu stuff
       }
       if((addr & 0xFF00) === 0xFF00) {
@@ -68,14 +107,16 @@ function createMemoryInterceptor(memory){
         } else if(addr === 0xFF43){
             return memory.GPUScrollX()
         } else if(addr === 0xFF44){
-            console.log('returning gpu line', memory.GPULine())
             return memory.GPULine()
+        } else {
+          //console.log('unsupported read', addr.toString(16))
         }
       }
       return interceptedMemory.readByte(addr)
     },
     writeByte(addr, value){
-      if((addr & 0xF000) === 0x8000 || (addr & 0xF000) === 0x9000){
+      if(((addr & 0xF000) === 0x8000) || ((addr & 0xF000) === 0x9000)){
+        //console.log('update tile data')
         updateTile(interceptedMemory, addr, value)
       } else if((addr & 0xFF00) === 0xFF00){
         if(addr === 0xFF40){
@@ -87,6 +128,8 @@ function createMemoryInterceptor(memory){
           memory.setGPUScrollY(value)
         } else if(addr === 0xFF43){
           memory.setGPUScrollX(value)
+        } else if(addr === 0xFF46){
+          console.log('writing ', addr, value)
         } else if(addr === 0xFF47){
           for(let i=0; i < 4; ++i){
             switch((value >> (i * 2)) & 3){
@@ -96,6 +139,8 @@ function createMemoryInterceptor(memory){
               case 3 : memory.setGPUPallete(i, [0, 0, 0, 255]); break
             }
           }
+        } else {
+          //console.log('unsuported write', addr.toString(16), ' ', value.toString(16))
         }
       }
       interceptedMemory.writeByte(addr, value)

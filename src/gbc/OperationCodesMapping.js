@@ -36,7 +36,7 @@ export const OperationCodesMapping = [
   opcodes.INC_X.bind(undefined, reg8.E),
   opcodes.DEC_X.bind(undefined, reg8.E),
   opcodes.LD_X_d8.bind(undefined, reg8.E),
-  opcodes.RR_X,
+  opcodes.RR_X.bind(undefined, reg8.A),
   //0x20
   opcodes.JR_SF_r8.bind(undefined, false, flags.zero),
   opcodes.LD_XY_d16.bind(undefined, reg8.H, reg8.L),

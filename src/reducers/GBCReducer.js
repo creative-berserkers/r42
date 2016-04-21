@@ -15,7 +15,9 @@ const initialState = {
 }
 
 const onScanLine = (memory) =>{
-  console.log('scanLine')
+  //console.log('scanLine')
+
+  console.log('memory.flag(flags.bgtile)', memory.flag(flags.bgtile))
 
   let mapOffset = memory.flag(flags.bgmap) ? 0x9C00 : 0x9800
   mapOffset += (((memory.GPULine() + memory.GPUScrollY()) & 255) >> 3)
@@ -33,12 +35,14 @@ const onScanLine = (memory) =>{
   if(memory.flag(flags.bgtile) && tile < 128) tile += 256
 
   for(let i=0; i<160; ++i){
-    color = memory.GPUPallete(memory.tilesetData(tile, x, y))
+    let pixel = memory.tilesetData(tile, x, y)
+    //console.log('pixel:', pixel)
+    color = memory.GPUPallete(pixel)
 
-    memory.setScreenData(canvasOffset+0, color)
-    memory.setScreenData(canvasOffset+1, color)
-    memory.setScreenData(canvasOffset+2, color)
-    memory.setScreenData(canvasOffset+3, 255)
+    memory.setScreenData(canvasOffset+0, color[i])
+    memory.setScreenData(canvasOffset+1, color[i])
+    memory.setScreenData(canvasOffset+2, color[i])
+    memory.setScreenData(canvasOffset+3, color[i])
     canvasOffset+=4
     x++
     if(x === 8){

@@ -208,10 +208,10 @@ function createMemory(canvas, buffer, tilesetBuffer, screenBuffer){
       tilesetByteView[(tile*64)+(y*8)+x] = val
     },
     screenData(index){
-      return screenByteView[index]
+      return screenByteView.data[index]
     },
     setScreenData(index, value){
-      screenByteView[index] = value
+      screenByteView.data[index] = value
     },
     screenDataObj(){
       return screenByteView
@@ -230,6 +230,14 @@ function createMemory(canvas, buffer, tilesetBuffer, screenBuffer){
       console.log('loading ',data.byteLength, 'bytes')
       for(let i=0;i<data.byteLength;++i){
         byteView[i] = data[i]
+      }
+
+      for(let i=0; i<512; ++i){
+        for(let y=0;y <8 ; y++){
+          for(let x=0; x < 8; x++){
+            tilesetByteView[(i*64)+(y*8)+x] = 255
+          }
+        }
       }
     }
   }
