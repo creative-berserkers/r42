@@ -30,6 +30,7 @@ const initialState = {
 
 const onScanLine = (memory) =>{
   //console.log('scanLine')
+  let line = memory.GPULine()
   let scrollX = memory.GPUScrollX()
   let scrollY = memory.GPUScrollY()
 
@@ -48,8 +49,15 @@ const onScanLine = (memory) =>{
 
   //if(memory.flag(flags.bgtile) && tile < 128) tile += 256
 
+  if(!memory.flag(flags.bgtile) && tile >= 128){
+    tile = ((tile << 24) >> 24)
+  }
+
+  console.log('bgtile', memory.flag(flags.bgtile))
+
   for(let i=0; i<160; ++i){
-    let pixel = memory.tilesetData(tile, x, y)
+    let t = ((!memory.flag(flags.bgtile) && tile >= 128) ? 256 : 0)
+    let pixel = memory.tilesetData(tile + t, x, y)
     //console.log('pixel:', pixel)
     color = memory.GPUPallete(pixel)
     //let c = (tile < 20) ? 255 : 0;
@@ -63,9 +71,47 @@ const onScanLine = (memory) =>{
       x = 0
       lineOffset = ((lineOffset + 1) % 32)
       tile = memory.readByte(mapOffset + lineOffset)
-      //if(memory.flag(flags.bgtile) && tile < 128) tile += 256
+      if(!memory.flag(flags.bgtile) && tile >= 128){
+        tile = ((tile << 24) >> 24)
+      }
     }
   }
+
+  /*if(memory.flag(flags.switchlcd)){
+    let scanRow = []
+    for(let i=0; i<160; i++) scanRow[i] = 0;
+    if(memory.flag(flags.switchbg)){
+      var linebase = line * 640;
+      var mapbase = memory.flag(flags.bgmap) + ((((line+scrollY)&255)>>3)<<5);
+      var y = (line+scrollY)&7;
+      var x = scrollX&7;
+      var t = (scrollX>>3)&31;
+      var pixel;
+      var w=160;
+
+      if(memory.flag(flags.bgtile)){
+        var tile = memory.readByte(mapbase+t)
+        if(tile<128) tile=256+tile;
+        var tilerow = memory.tilesetDataRow(tile,y);
+        do {
+          scanRow[160-x] = tilerow[x];
+          memory.setScreenData(linebase+3, memory.GPUPallete(tilerow[x]))
+          x++;
+          if(x==8) { t=(t+1)&31; x=0; tile=memory.readByte(mapbase+t); if(tile<128) tile=256+tile; tilerow = memory.tilesetDataRow(tile,y); }
+          linebase+=4;
+        } while(--w);
+      } else {
+        var tilerow=memory.tilesetDataRow(memory.readByte(mapbase+t),y)
+        do {
+          scanRow[160-x] = tilerow[x];
+          memory.setScreenData(linebase+3 , memory.GPUPallete(tilerow[x]))
+          x++;
+          if(x==8) { t=(t+1)&31; x=0; tilerow=memory.tilesetDataRow(memory.readByte(mapbase+t),y); }
+          linebase+=4;
+        } while(--w);
+      }
+    }
+  }*/
 }
 
 const onVBlank = (memory)=>{

@@ -202,10 +202,13 @@ function createMemory(canvas, buffer, tileset, screenBuffer){
       byteView[IRQEnableDelayMapping] = value
     },
     tilesetData(tile, x, y){
-      return tileset[tile][x][y]
+      return tileset[tile][y][x]
     },
     setTilesetData(tile, x, y, val){
-      tileset[tile][x][y] = val
+      tileset[tile][y][x] = val
+    },
+    tilesetDataRow(tile, y){
+      return tileset[tile][y]
     },
     screenData(index){
       return screenByteView.data[index]

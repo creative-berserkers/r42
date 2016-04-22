@@ -84,7 +84,7 @@ function createMemoryInterceptor(memory){
       if((addr & 0xFF00) === 0xFF00) {
         //io stuff
         if(addr === 0xFF40){
-            return (memory.flag(flags.switchlcd)? 0x01:0x00) |
+            return (memory.flag(flags.switchbg)? 0x01:0x00) |
               (memory.flag(flags.bgmap) ? 0x08 : 0x00) |
               (memory.flag(flags.bgtile) ? 0x10 : 0x00) |
               (memory.flag(flags.switchlcd) ? 0x80 : 0x00)
@@ -225,6 +225,9 @@ function createMemoryInterceptor(memory){
     },
     setTilesetData(tile, x, y,val){
       interceptedMemory.setTilesetData(tile, x, y, val)
+    },
+    tilesetDataRow(tile, y){
+      return interceptedMemory.tilesetDataRow(tile, y)
     },
     screenData(index){
       return interceptedMemory.screenData(index)
