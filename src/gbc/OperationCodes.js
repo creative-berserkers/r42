@@ -390,7 +390,7 @@ export function OR_X_mYZ(regX, regY, regZ, memory){
 
 export function CP_X_Y(regX, regY, memory){
   const tmp = memory.reg8(regX) - memory.reg8(regY)
-  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.zero, tmp === 0)
   memory.setFlag(flags.halfCarry, (tmp &0xF) > (memory.reg8(regX) & 0xF))
   memory.setFlag(flags.subtract, true)
   memory.setFlag(flags.carry,tmp < 0)
@@ -400,7 +400,7 @@ export function CP_X_Y(regX, regY, memory){
 export function CP_X_mYZ(regX, regY, regZ, memory){
   const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
   const tmp = memory.reg8(regX) - memory.readByte(addr)
-  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.zero, tmp === 0)
   memory.setFlag(flags.halfCarry, (tmp &0xF) > (memory.reg8(regX) & 0xF))
   memory.setFlag(flags.subtract, true)
   memory.setFlag(flags.carry,tmp < 0)

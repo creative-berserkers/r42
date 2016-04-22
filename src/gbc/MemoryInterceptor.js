@@ -67,12 +67,12 @@ function createMemoryInterceptor(memory){
     },
     readByte(addr){
       if ((addr & 0xF000) === 0x0000) {
-        if (!interceptedMemory.flag(flags.isOutOfBios)) { //read bios?
+        /*if (!interceptedMemory.flag(flags.isOutOfBios)) { //read bios?
           if (addr < 0x0100)
             return bios[addr]
           else if (interceptedMemory.PC() === 0x0100)
             interceptedMemory.setFlag(flags.isOutOfBios, true)
-        }
+        }*/
       }
       if((addr & 0xF000) === 0xE000) { //shadow ram
         return interceptedMemory.readByte(addr & 0xDFFF)

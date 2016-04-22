@@ -119,7 +119,8 @@ export default {
         <div class="form-group">
           <button type="button" class="btn btn-default" onClick={onLoadROMClicked(dispatch, context, 'opus5.gb')} disabled={context.playing}>Load test opus5 test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '01-special.gb')} disabled={context.playing}>Load test 01-special test</button>
-            <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'ttt.gb')} disabled={context.playing}>Load test ttt</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '07-jr,jp,call,ret,rst.gb')} disabled={context.playing}>Load test 07-jr,jp,call,ret,rst test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'ttt.gb')} disabled={context.playing}>Load test ttt</button>
         </div>
         <div class="form-group">
           <button type="button" class="btn btn-default"  onClick={onsetPCClicked(dispatch, context, 0x00)} disabled={context.playing}>Set PC to 0x00</button>
