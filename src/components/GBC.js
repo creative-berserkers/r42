@@ -72,7 +72,7 @@ const onPlayClicked = (dispatch, context) =>{
       } else {
         timerId = setInterval(()=>{
           dispatch(stepBackwardCycle())
-        }, (1000/context.playingSpeed))
+        }, (1000/Math.abs(context.playingSpeed)))
       }
       dispatch(play(context.playingSpeed))
     }

@@ -49,14 +49,14 @@ const onScanLine = (memory) =>{
 
   //if(memory.flag(flags.bgtile) && tile < 128) tile += 256
 
-  if(!memory.flag(flags.bgtile) && tile >= 128){
+  if(!memory.flag(flags.bgtile)){
     tile = ((tile << 24) >> 24)
   }
 
-  console.log('bgtile', memory.flag(flags.bgtile))
+  //console.log('bgtile', memory.flag(flags.bgtile))
 
   for(let i=0; i<160; ++i){
-    let t = ((!memory.flag(flags.bgtile) && tile >= 128) ? 256 : 0)
+    let t = ((!memory.flag(flags.bgtile)) ? 256 : 0)
     let pixel = memory.tilesetData(tile + t, x, y)
     //console.log('pixel:', pixel)
     color = memory.GPUPallete(pixel)
@@ -71,7 +71,7 @@ const onScanLine = (memory) =>{
       x = 0
       lineOffset = ((lineOffset + 1) % 32)
       tile = memory.readByte(mapOffset + lineOffset)
-      if(!memory.flag(flags.bgtile) && tile >= 128){
+      if(!memory.flag(flags.bgtile)){
         tile = ((tile << 24) >> 24)
       }
     }
@@ -148,10 +148,13 @@ export default function GBCReducer(state = initialState, action) {
     case STEP_BACKWARD_CYCLE:
       if(state.history.length === 0)
         return state
-      else return Object.assign({}, state, {
+      else {
+        onVBlank(state.currentMemory)
+        return Object.assign({}, state, {
           history : [...state.history.slice(0, state.history.length-1)],
           currentMemory: state.history[state.history.length-1]
-      })
+        })
+      }
     case SHOW_MEMORY_DUMP:
       return Object.assign({}, state, { showMemoryDump: action.flag})
     case PLAY:
