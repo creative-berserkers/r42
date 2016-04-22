@@ -46,19 +46,19 @@ export function LD_X_d8(regX, memory){
 }
 
 export function RLC_X(regX, memory){
-  const ci = (memory.reg8(regX)&128)?1:0
-  memory.setReg8(regX, (memory.reg8(regX) << 1)+ci)
+  memory.setFlag(flags.carry,memory.reg8(regX) > 0x7F)
+  memory.setReg8(regX, ((memory.reg8(regX) << 1)&0xFF) | (memory.reg8(regX) >> 7) )
   memory.setFlag(flags.zero,false)
   memory.setFlag(flags.subtract,false)
   memory.setFlag(flags.halfCarry,false)
-  memory.setFlag(flags.carry,ci === 1)
   memory.setLastInstructionClock(1)
 }
 
 export function LD_a16_SP(memory){
-  const addr = memory.readWord(memory.PC())
-  memory.writeWord(addr, memory.SP())
+  const tmp = ((memory.readByte(memory.PC()+1)<<8) | memory.readByte(memory.PC()))
   memory.setPC(memory.PC() + 2)
+  memory.writeByte(tmp, memory.SP() & 0xFF)
+  memory.writeByte(tmp+1, memory.SP() >> 8)
   memory.setLastInstructionClock(5)
 }
 
@@ -77,13 +77,13 @@ export function ADD_XY_ZQ(regX, regY, regZ, regQ, memory){
 }
 
 export function LD_X_mYZ(regX, regY, regZ, memory){
-  const tmp = memory.readByte((memory.reg8(regY)<<8)+memory.reg8(regZ))
+  const tmp = memory.readByte((memory.reg8(regY)<<8)|memory.reg8(regZ))
   memory.setReg8(regX, tmp)
   memory.setLastInstructionClock(2)
 }
 
 export function DEC_XY(regX, regY, memory){
-  const tmp = ((memory.reg8(regX)<<8)+(memory.reg8(regY))-1)&0xFFFF
+  const tmp = (((memory.reg8(regX)<<8)|(memory.reg8(regY)))-1)&0xFFFF
   memory.setReg8(regX, tmp>>8)
   memory.setReg8(regY, tmp)
   memory.setLastInstructionClock(2)
@@ -182,7 +182,7 @@ export function DAX(regX, memory){
 }
 
 export function LD_N_X_mYZ(n,regX, regY, regZ, memory){
-  const tmp = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  const tmp = (memory.reg8(regY)<<8)|memory.reg8(regZ)
   memory.setReg8(regX, memory.readByte(tmp))
   const tmp2 = tmp + n
   memory.setReg8(regY, tmp2>>8)
@@ -198,9 +198,9 @@ export function CPL_X(regX, memory){
 }
 
 export function INC_mXY(regX, regY, memory) {
-  const addr = (memory.reg8(regX)<<8)+memory.reg8(regY)
+  const addr = (memory.reg8(regX)<<8)|memory.reg8(regY)
   const tmp = (memory.readByte(addr) + 1)
-  memory.setFlag(flags.zero, (tmp == 0))
+  memory.setFlag(flags.zero, (tmp === 0))
   memory.setFlag(flags.halfCarry, (tmp & 0xF) === 0)
   memory.setFlag(flags.subtract, false)
   memory.writeByte(addr, tmp)
@@ -208,10 +208,10 @@ export function INC_mXY(regX, regY, memory) {
 }
 
 export function DEC_mXY(regX, regY, memory) {
-  const addr = (memory.reg8(regX)<<8)+memory.reg8(regY)
+  const addr = (memory.reg8(regX)<<8)|memory.reg8(regY)
   const tmp = (memory.readByte(addr) - 1)
-  memory.setFlag(flags.zero, (tmp == 0))
-  memory.setFlag(flags.halfCarry,((tmp & 0xF) == 0xF))
+  memory.setFlag(flags.zero, (tmp === 0))
+  memory.setFlag(flags.halfCarry,((tmp & 0xF) === 0xF))
   memory.setFlag(flags.subtract, true)
   memory.writeByte(addr, tmp)
   memory.setLastInstructionClock(3)
@@ -258,7 +258,7 @@ export function ADD_X_Y(regX, regY, memory){
 }
 
 export function ADD_X_mYZ(regX, regY, regZ, memory){
-  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  const addr = (memory.reg8(regY)<<8)|memory.reg8(regZ)
   const sum = memory.reg8(regX) + memory.readByte(addr)
   memory.setFlag(flags.halfCarry, (sum & 0xF) < (memory.reg8(regX) & 0xF))
   memory.setFlag(flags.carry,(sum > 0xFF))
@@ -279,9 +279,9 @@ export function ADC_X_Y(regX, regY, memory){
 }
 
 export function ADC_X_mYZ(regX, regY, regZ, memory){
-  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  const addr = (memory.reg8(regY)<<8)|memory.reg8(regZ)
   const sum = memory.reg8(regX) + memory.readByte(addr) + (memory.flag(flags.carry)? 1 : 0)
-  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) + memory.readByte(addr) + (memory.flag(flags.carry)? 1 : 0) > 0xF))
+  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) + (memory.readByte(addr) & 0xF) + (memory.flag(flags.carry)? 1 : 0) > 0xF))
   memory.setFlag(flags.carry,(sum > 0xFF))
   memory.setReg8(regX, sum)
   memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
@@ -300,7 +300,7 @@ export function SUB_X_Y(regX, regY, memory){
 }
 
 export function SUB_X_mYZ(regX, regY, regZ, memory){
-  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  const addr = (memory.reg8(regY)<<8)|memory.reg8(regZ)
   const sum = memory.reg8(regX) - memory.readByte(addr)
   memory.setFlag(flags.halfCarry, (memory.reg8(regX) & 0xF) < (sum & 0xF))
   memory.setFlag(flags.carry,(sum < 0))
@@ -321,9 +321,9 @@ export function SBC_X_Y(regX, regY, memory){
 }
 
 export function SBC_X_mYZ(regX, regY, regZ, memory){
-  const addr = (memory.reg8(regY)<<8)+memory.reg8(regZ)
+  const addr = (memory.reg8(regY)<<8)|memory.reg8(regZ)
   const sum = memory.reg8(regX) - memory.readByte(addr) - ((memory.flag(flags.carry)) ? 1 : 0)
-  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) - (memory.reg8(regY) & 0xF) - (memory.flag(flags.carry)? 1 : 0) > 0xF) < 0)
+  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) - (memory.reg8(regY) & 0xF) - (memory.flag(flags.carry)? 1 : 0)) < 0)
   memory.setFlag(flags.carry,(sum < 0))
   memory.setReg8(regX, sum)
   memory.setFlag(flags.zero, (sum === 0))

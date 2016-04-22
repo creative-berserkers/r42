@@ -83,7 +83,13 @@ function createMemoryInterceptor(memory){
       }
       if((addr & 0xFF00) === 0xFF00) {
         //io stuff
-        if(addr === 0xFF40){
+        if(addr === 0xFF00){ //keys
+          switch(interceptedMemory.inputColumn()){
+	           case 0x10: return memory.keyState()[0]
+	           case 0x20: return memory.keyState()[1]
+	           default: return 0;
+	        }
+        } else if(addr === 0xFF40){
             return (memory.flag(flags.switchbg)? 0x01:0x00) |
               (memory.flag(flags.bgmap) ? 0x08 : 0x00) |
               (memory.flag(flags.bgtile) ? 0x10 : 0x00) |
@@ -106,7 +112,9 @@ function createMemoryInterceptor(memory){
         updateTile(interceptedMemory, addr, value)
         return;
       } else if((addr & 0xFF00) === 0xFF00){
-        if(addr === 0xFF40){
+        if(addr === 0xFF00){//keys
+          memory.setInputColumn(value & 0x30)
+        } else if(addr === 0xFF40){
           memory.setFlag(flags.switchbg, (value & 0x01) ? true : false)
           memory.setFlag(flags.bgmap, (value & 0x08) ? true : false)
           memory.setFlag(flags.bgtile, (value & 0x10) ? true : false)
@@ -246,6 +254,18 @@ function createMemoryInterceptor(memory){
     },
     loadROM(data){
       interceptedMemory.loadROM(data)
+    },
+    inputColumn(){
+      return interceptedMemory.inputColumn()
+    },
+    setInputColumn(col){
+      interceptedMemory.setInputColumn(col)
+    },
+    keyState(){
+      return interceptedMemory.keyState()
+    },
+    setKeyState(keyCode, state){
+      interceptedMemory.setKeyState(keyCode, state)
     }
   }
 

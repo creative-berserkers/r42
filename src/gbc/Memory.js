@@ -72,6 +72,8 @@ const gpuLineMapping = 0x10018
 const gpuScrollXMapping = 0x10019
 const gpuScrollYMapping = 0x10020
 const gpuBGTileMapping = 0x10021
+const keyboardMapping = 0x10022
+const inputColumnMapping = 0x10024
 const gpuPalleteMapping = 0x10030
 
 function createMemory(canvas, buffer, tileset, screenBuffer){
@@ -234,6 +236,45 @@ function createMemory(canvas, buffer, tileset, screenBuffer){
       for(let i=0;i<data.byteLength;++i){
         byteView[i] = data[i]
       }
+    },
+    inputColumn(){
+      return byteView[inputColumnMapping]
+    },
+    setInputColumn(col){
+      byteView[inputColumnMapping] = col
+    },
+    keyState(){
+      return [byteView[keyboardMapping], byteView[keyboardMapping+1]]
+    },
+    setKeyState(keyCode, state){
+      let firstByte = byteView[keyboardMapping]
+      let secondByte = byteView[keyboardMapping+1]
+      if(state){
+        switch(keyCode){
+          case 39: secondByte &= 0xE; break;
+          case 37: secondByte &= 0xD; break;
+          case 38: secondByte &= 0xB; break;
+          case 40: secondByte &= 0x7; break;
+          case 90: firstByte &= 0xE; break;
+          case 88: firstByte &= 0xD; break;
+          case 32: firstByte &= 0xB; break;
+          case 13: firstByte &= 0x7; break;
+	      }
+      } else {
+        switch(keyCode){
+          case 39: secondByte |= 0x1; break;
+          case 37: secondByte |= 0x2; break;
+          case 38: secondByte |= 0x4; break;
+          case 40: secondByte |= 0x8; break;
+          case 90: firstByte |= 0x1; break;
+          case 88: firstByte |= 0x2; break;
+          case 32: firstByte |= 0x4; break;
+          case 13: firstByte |= 0x8; break;
+	      }
+      }
+
+      byteView[keyboardMapping] = firstByte
+      byteView[keyboardMapping+1] = secondByte
     }
   }
 }

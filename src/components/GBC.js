@@ -1,5 +1,5 @@
 import {element} from 'deku'
-import {stepForwardCycle, stepBackwardCycle, showMemoryDump, play, stop, changeSpeed, changeThreshold, loadROM, setPC} from '../actions/GBCActions'
+import {stepForwardCycle, stepBackwardCycle, showMemoryDump, play, stop, changeSpeed, changeThreshold, loadROM, setPC, keyUp, keyDown} from '../actions/GBCActions'
 import {default as Memory, reg8, flags} from '../gbc/MemoryInterceptor'
 import {OperationCodesMapping as opcodes} from './../../src/gbc/OperationCodesMapping'
 
@@ -113,6 +113,24 @@ const printMemory = (memory) => {
 }
 
 export default {
+  onCreate({dispatch, context}){
+    document.onkeydown = function(e){
+      e = e || window.event
+      if(e.keyCode === 39 || e.keyCode === 37 || e.keyCode === 38 || e.keyCode ===40 ||
+        e.keyCode === 90 || e.keyCode === 88 || e.keyCode === 32 || e.keyCode === 13){
+        e.preventDefault()
+        dispatch(keyDown(e.keyCode))
+      }
+    }
+    document.onkeyup = function(e){
+      e = e || window.event
+      if(e.keyCode === 39 || e.keyCode === 37 || e.keyCode === 38 || e.keyCode ===40 ||
+        e.keyCode === 90 || e.keyCode === 88 || e.keyCode === 32 || e.keyCode === 13){
+        e.preventDefault()
+        dispatch(keyUp(e.keyCode))
+      }
+    }
+  },
   render({dispatch, context}) {
     return (
       <div>

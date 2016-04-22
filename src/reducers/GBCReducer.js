@@ -1,4 +1,4 @@
-import {STEP_FORWARD_CYCLE,STEP_BACKWARD_CYCLE, SHOW_MEMORY_DUMP, PLAY, STOP, CHANGE_SPEED, CHANGE_THRESHOLD, LOAD_ROM, SET_PC} from '../actions/GBCActions'
+import {STEP_FORWARD_CYCLE,STEP_BACKWARD_CYCLE, SHOW_MEMORY_DUMP, PLAY, STOP, CHANGE_SPEED, CHANGE_THRESHOLD, LOAD_ROM, SET_PC, KEY_UP, KEY_DOWN} from '../actions/GBCActions'
 import {default as Memory, reg8, flags} from '../gbc/MemoryInterceptor'
 import {OperationCodesMapping as opcodes} from '../gbc/OperationCodesMapping'
 import {step} from '../gbc/CPU'
@@ -120,22 +120,23 @@ const onVBlank = (memory)=>{
 
 export default function GBCReducer(state = initialState, action) {
   let history
+  let memory
   switch (action.type) {
     case LOAD_ROM:
-      const newMemory1 = state.currentMemory.clone()
+      memory = state.currentMemory.clone()
       history = [...state.history, state.currentMemory]
       if(history.length>maxHistory){
         history = [...state.history.slice(1)]
       }
-      newMemory1.loadROM(action.data)
+      memory.loadROM(action.data)
       return Object.assign({}, state,{
           history : history,
-          currentMemory: newMemory1
+          currentMemory: memory
       })
     case STEP_FORWARD_CYCLE:
-      const newMemory2 = state.currentMemory.clone()
+      memory = state.currentMemory.clone()
       for(let i=0; i < state.playingThreshold; ++i){
-        step(opcodes, newMemory2, onScanLine, onVBlank)
+        step(opcodes, memory, onScanLine, onVBlank)
       }
       history = [...state.history, state.currentMemory]
       if(history.length>maxHistory){
@@ -143,7 +144,7 @@ export default function GBCReducer(state = initialState, action) {
       }
       return Object.assign({}, state,{
           history : history,
-          currentMemory: newMemory2
+          currentMemory: memory
       })
     case STEP_BACKWARD_CYCLE:
       if(state.history.length === 0)
@@ -166,15 +167,37 @@ export default function GBCReducer(state = initialState, action) {
     case CHANGE_THRESHOLD:
       return Object.assign({}, state, { playingThreshold: action.threshold})
     case SET_PC:
-      const newMemory3 = state.currentMemory.clone()
-      newMemory3.setPC(action.pc)
+      memory = state.currentMemory.clone()
+      memory.setPC(action.pc)
       history = [...state.history, state.currentMemory]
       if(history.length>maxHistory){
         history = [...state.history.slice(1)]
       }
       return Object.assign({}, state,{
           history : history,
-          currentMemory: newMemory3
+          currentMemory: memory
+      })
+    case KEY_DOWN:
+      memory = state.currentMemory.clone()
+      memory.setKeyState(action.key, true)
+      history = [...state.history, state.currentMemory]
+      if(history.length>maxHistory){
+        history = [...state.history.slice(1)]
+      }
+      return Object.assign({}, state,{
+          history : history,
+          currentMemory: memory
+      })
+    case KEY_UP:
+      memory = state.currentMemory.clone()
+      memory.setKeyState(action.key, false)
+      history = [...state.history, state.currentMemory]
+      if(history.length>maxHistory){
+        history = [...state.history.slice(1)]
+      }
+      return Object.assign({}, state,{
+          history : history,
+          currentMemory: memory
       })
     default:
       return state

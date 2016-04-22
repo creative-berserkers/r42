@@ -67,3 +67,19 @@ export function setPC(pc){
     pc : pc
   }
 }
+
+export const KEY_DOWN = 'KEY_DOWN'
+export function keyDown(key){
+  return {
+    type : KEY_DOWN,
+    key : key
+  }
+}
+
+export const KEY_UP = 'KEY_UP'
+export function keyUp(key){
+  return {
+    type : KEY_UP,
+    key : key
+  }
+}
