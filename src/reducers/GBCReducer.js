@@ -5,7 +5,7 @@ import {step} from '../gbc/CPU'
 
 let canvas = document.getElementById('display').getContext('2d')
 
-const initMemory = Memory.createEmptyMemory(canvas)
+const initMemory = Memory.createEmptyMemoryFromCanvas(canvas)
 
 initMemory.setSP(0xFFFE)
 initMemory.setReg8(reg8.A, 0x01)

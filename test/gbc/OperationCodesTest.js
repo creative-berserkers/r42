@@ -175,7 +175,7 @@ describe('Operation codes test', ()=>{
     it('should copy to memory[memory[PC]] value from SP',()=>{
       expect(memory.readWord(0x0003)).to.equal(17)
     })
-    
+
     expectNumberOfCycle(5, memory)
   })
 
@@ -239,10 +239,10 @@ describe('Operation codes test', ()=>{
       expect(memory.reg8(reg8.A)).to.equal(192)
     })
   })
-  
+
   describe('STOP',()=>{
     const memory = Memory.createEmptyMemory()
-    
+
     opcodes.STOP(memory)
     it('should set stop flag',()=>{
       expect(memory.flag(flags.stop)).to.equal(true)
@@ -338,7 +338,7 @@ describe('Operation codes test', ()=>{
     })
     expectNumberOfCycle(2, memory)
   })
-  
+
   describe('DAX',()=>{
     const memory = Memory.createEmptyMemory()
     memory.setReg8(reg8.A, 0x3C)
@@ -993,7 +993,7 @@ describe('Operation codes test', ()=>{
     it('should increase PC by 1',()=>{
       expect(memory.PC()).to.equal(0x0002)
     })
-    expectNumberOfCycle(3, memory)
+    expectNumberOfCycle(2, memory)
   })
 
   describe('CALL_a16',()=>{

@@ -25,7 +25,7 @@ function logState(memory){
     'f(isOutOfBios)',memory.flag(flags.isOutOfBios))
 }
 
-describe('CPU test', ()=>{
+/*describe('CPU test', ()=>{
   it('',()=>{
     const memory = Memory.createEmptyMemory()
     console.log('Init memory')
@@ -37,4 +37,4 @@ describe('CPU test', ()=>{
       logState(memory)
     }
   })
-});
+});*/

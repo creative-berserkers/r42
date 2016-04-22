@@ -250,13 +250,10 @@ let createEmptyTileset = () => {
 export default {
   expectedBufferSize,
   createMemory,
-  createEmptyMemory(canvas){
+  createEmptyMemoryFromCanvas(canvas){
     return createMemory(canvas, new ArrayBuffer(expectedBufferSize),createEmptyTileset(), canvas.createImageData(160, 144))
   },
-  createMemoryWithRom(canvas, rom){
-    const memory = new ArrayBuffer(expectedBufferSize)
-    const tileset = createEmptyTileset()
-    const screen = canvas.createImageData(160, 144)
-    return createMemory(canvas, memory,tileset, screen)
+  createEmptyMemory(){
+    return createMemory(null, new ArrayBuffer(expectedBufferSize),createEmptyTileset(), null)
   }
 }

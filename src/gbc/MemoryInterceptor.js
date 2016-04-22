@@ -18,7 +18,7 @@ const bios = [
   0x21, 0x04, 0x01, 0x11, 0xA8, 0x00, 0x1A, 0x13, 0xBE, 0x20, 0xFE, 0x23, 0x7D, 0xFE, 0x34, 0x20,
   0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50]
 
-let canvas = document.getElementById('tileset').getContext('2d')
+let canvas = (typeof document !== 'undefined')? document.getElementById('tileset').getContext('2d') : null
 
 const renderTileset = (memory, tile) => {
     let tileY = Math.floor(tile / 32)
@@ -253,10 +253,10 @@ export {reg8, flags} from './Memory'
 
 export default {
   expectedBufferSize: Memory.expectedBufferSize,
-  createEmptyMemory(canvas){
-    return createMemoryInterceptor(Memory.createEmptyMemory(canvas))
+  createEmptyMemoryFromCanvas(canvas){
+    return createMemoryInterceptor(Memory.createEmptyMemoryFromCanvas(canvas))
   },
-  createMemoryWithRom(rom){
-    return createMemoryInterceptor(Memory.createMemoryWithRom(canvas, rom))
+  createEmptyMemory(){
+    return createMemoryInterceptor(Memory.createEmptyMemory())
   }
 }
