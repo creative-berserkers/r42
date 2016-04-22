@@ -5,7 +5,10 @@
     <style>
       .memoryblock {
         word-wrap: break-word;
-        font-family: monospace;
+        width: 400px;
+        height: 400px;
+        overflow: overlay;
+        background-color: burlywood;
       }
       b.pc-counter {
         background-color: #00d6b2;
@@ -13,12 +16,47 @@
       .tileset {
         border: 1px solid black;
       }
+      #gbc-container {
+         background-image: url("static/img/game_boy.png");
+         background-position: -90px 0px;
+         width: 500px;
+         height: 710px;
+      }
+      #skin {
+      }
+      #display {
+        position: relative;
+        top: 102px;
+        left: 107px;
+        width: 228px;
+      }
+      #tileset {
+        margin: 20px;
+        background-color: gray;
+      }
     </style>
   </head>
-  <body>
-    <canvas id="display"></canvas>
-    <canvas id="tileset" width="256" height="128" class="tileset"></canvas>
-    <div id="mount"></div>
+  <body style="background-color: cornflowerblue;font-family: monospace;">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-6">
+          <div id="gbc-container">
+            <canvas id="display" width="160" height="144"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <canvas id="tileset" width="256" height="128" class="tileset"></canvas>
+          <div id="mount"></div>
+        </div>
+      </div>
+    </div>
     <script src="/static/bundle.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="static/css/bootstrap-theme.min.css" >
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="static/js/jquery-1.12.3.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
   </body>
 </html>

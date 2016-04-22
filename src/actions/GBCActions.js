@@ -59,3 +59,11 @@ export function loadROM(data){
     data : data
   }
 }
+
+export const SET_PC = 'SET_PC'
+export function setPC(pc){
+  return {
+    type : SET_PC,
+    pc : pc
+  }
+}

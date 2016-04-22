@@ -1,14 +1,14 @@
 import {element} from 'deku'
-import {stepForwardCycle, stepBackwardCycle, showMemoryDump, play, stop, changeSpeed, changeThreshold, loadROM} from '../actions/GBCActions'
+import {stepForwardCycle, stepBackwardCycle, showMemoryDump, play, stop, changeSpeed, changeThreshold, loadROM, setPC} from '../actions/GBCActions'
 import {default as Memory, reg8, flags} from '../gbc/MemoryInterceptor'
 import {OperationCodesMapping as opcodes} from './../../src/gbc/OperationCodesMapping'
 
 let timerId = undefined
 
-const onLoadROMClicked = (dispatch, context) => {
+const onLoadROMClicked = (dispatch, context, name) => {
   return (event) => {
     var oReq = new XMLHttpRequest();
-    oReq.open("GET", "/testrom", true);
+    oReq.open("GET", "/testrom?name="+name, true);
     oReq.responseType = "arraybuffer";
 
     oReq.onload = function (oEvent) {
@@ -89,6 +89,12 @@ const onStopClicked = (dispatch, context) => {
   }
 }
 
+const onsetPCClicked = (dispatch, context, pc)=>{
+  return (event) => {
+    dispatch(setPC(pc))
+  }
+}
+
 const formatHex = (val) => {
   let num = val.toString(16).toUpperCase()
   return ("0" + num).slice(-2)
@@ -110,20 +116,31 @@ export default {
   render({dispatch, context}) {
     return (
       <div>
-        <div>
-          <button onClick={onLoadROMClicked(dispatch, context)} disabled={context.playing}>Load test ROM</button>
+        <div class="form-group">
+          <button type="button" class="btn btn-default" onClick={onLoadROMClicked(dispatch, context, 'opus5.gb')} disabled={context.playing}>Load test opus5 test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '01-special.gb')} disabled={context.playing}>Load test 01-special test</button>
         </div>
-        <div>
-          <button onClick={onPrevCycleClicked(dispatch, context)} disabled={context.playing}>Prev Step</button>
-          <button onClick={onNextCycleClicked(dispatch, context)} disabled={context.playing}>Next Step</button>
+        <div class="form-group">
+          <button type="button" class="btn btn-default"  onClick={onsetPCClicked(dispatch, context, 0x00)} disabled={context.playing}>Set PC to 0x00</button>
+          <button type="button" class="btn btn-default"  onClick={onsetPCClicked(dispatch, context, 0x100)} disabled={context.playing}>Set PC to 0x100</button>
         </div>
-        <div>
-          Speed: <input type='text' onChange={handleSpeedChange(dispatch, context)} size='4' value={context.playingSpeed} disabled={context.playing}></input>
-          Threshold: <input type='text' onChange={handleThresholdChange(dispatch, context)} size='4' value={context.playingThreshold} disabled={context.playing}></input>
-          <button onClick={onPlayClicked(dispatch, context)}>Play</button>
-          <button onClick={onStopClicked(dispatch, context)}>Stop</button>
+        <div class="form-group">
+          <button type="button" class="btn btn-default"  onClick={onPrevCycleClicked(dispatch, context)} disabled={context.playing}>Prev Step</button>
+          <button type="button" class="btn btn-default"  onClick={onNextCycleClicked(dispatch, context)} disabled={context.playing}>Next Step</button>
         </div>
-        <div>
+        <div class="form-inline">
+          <div class="form-group">
+            Speed: <input type='text' class="form-control" onChange={handleSpeedChange(dispatch, context)} size='4' value={context.playingSpeed} disabled={context.playing}></input>
+          </div>
+          <div class="form-group">
+            Threshold: <input type='text' class="form-control" onChange={handleThresholdChange(dispatch, context)} size='4' value={context.playingThreshold} disabled={context.playing}></input>
+          </div>
+        </div>
+        <div class="form-group">
+          <button type="button" class="btn btn-default"  onClick={onPlayClicked(dispatch, context)}>Play</button>
+          <button type="button" class="btn btn-default"  onClick={onStopClicked(dispatch, context)}>Stop</button>
+        </div>
+        <div class="form-group">
           <table>
             <tr>
               <td>Clock:{context.currentMemory.clock()}</td>
@@ -159,8 +176,8 @@ export default {
             </tr>
           </table>
           <div>
-            <button onClick={onShowMemoryDumpClicked(dispatch, context)} disabled={context.playing}>Show memory dump {context.showMemoryDump === true? 'ON' : 'OFF'}</button>
-            <div class="memoryblock" innerHTML={(context.showMemoryDump === true) ? printMemory(context.currentMemory) : ''}></div>
+            <button type="button" class="btn btn-default"  onClick={onShowMemoryDumpClicked(dispatch, context)} disabled={context.playing}>Show memory dump {context.showMemoryDump === true? 'ON' : 'OFF'}</button>
+            {(context.showMemoryDump === true) ? <div class="memoryblock" innerHTML={(context.showMemoryDump === true) ? printMemory(context.currentMemory) : ''}></div>:null}
           </div>
         </div>
       </div>

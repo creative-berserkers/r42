@@ -12,9 +12,10 @@ var app = express()
 
 app.use(dev(compiler, {noInfo: true, publicPath: config.output.publicPath}))
 app.use(hot(compiler))
+app.use('/static', express.static('public'));
 
 app.get('/testrom', function(req, res){
-  res.sendFile(path.join(__dirname, '01-special.gb'));
+  res.sendFile(path.join(__dirname,'roms', req.query['name']));
 })
 
 app.get('*', function(req, res) {
