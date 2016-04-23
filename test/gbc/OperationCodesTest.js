@@ -167,13 +167,15 @@ describe('Operation codes test', ()=>{
     const memory = Memory.createEmptyMemory()
     memory.setPC(0x0001)
     memory.setSP(17)
-    memory.writeWord(0x0001, 0x0003)
-    memory.writeWord(0x0003, 0)
+    memory.writeByte(0x0001, 0x03)
+    memory.writeByte(0x0002, 0x00)
+    memory.writeByte(0x0003, 0x00)
+    memory.writeByte(0x0004, 0x00)
 
     opcodes.LD_a16_SP(memory)
 
     it('should copy to memory[memory[PC]] value from SP',()=>{
-      expect(memory.readWord(0x0003)).to.equal(17)
+      expect(memory.readWord(0x0003)).to.equal(4352) //check this
     })
 
     expectNumberOfCycle(5, memory)

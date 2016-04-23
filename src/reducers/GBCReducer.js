@@ -18,7 +18,7 @@ initMemory.setReg8(reg8.L, 0x4D)
 initMemory.setReg8(reg8.F, 0xB0)
 initMemory.setPC(0x00)
 
-const maxHistory = 100
+const maxHistory = 200
 const initialState = {
     history: [],
     currentMemory : initMemory,
