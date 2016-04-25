@@ -431,6 +431,7 @@ export function JP_S_F_a16(state, flag, memory){
     memory.setPC(memory.readWord(memory.PC()))
     memory.setLastInstructionClock(4)
   } else {
+    memory.setPC(memory.PC()+2)
     memory.setLastInstructionClock(3)
   }
 }
@@ -569,7 +570,7 @@ export function LD_mX_Y(regX, regY, memory){
 }
 
 export function AND_X_d8(regX, memory){
-  memory.reg8(regX, memory.reg8(regX) & memory.readByte(memory.PC()))
+  memory.setReg8(regX, memory.reg8(regX) & memory.readByte(memory.PC()))
   memory.setPC(memory.PC() + 1)
   memory.setFlag(flags.zero, (memory.reg8(regX)) === 0)
   memory.setFlag(flags.halfCarry, true)
