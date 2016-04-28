@@ -1,4 +1,4 @@
-import {flags} from './Memory'
+import {flags, reg8} from './Memory'
 
 export function NOP(memory){
   memory.setLastInstructionClock(1)
@@ -199,7 +199,7 @@ export function CPL_X(regX, memory){
 
 export function INC_mXY(regX, regY, memory) {
   const addr = (memory.reg8(regX)<<8)|memory.reg8(regY)
-  const tmp = (memory.readByte(addr) + 1)
+  const tmp = (memory.readByte(addr) + 1) & 0xFF
   memory.setFlag(flags.zero, (tmp === 0))
   memory.setFlag(flags.halfCarry, (tmp & 0xF) === 0)
   memory.setFlag(flags.subtract, false)
@@ -249,7 +249,7 @@ export function HALT(memory){
 
 export function ADD_X_Y(regX, regY, memory){
   const sum = memory.reg8(regX) + memory.reg8(regY);
-  memory.setFlag(flags.halfCarry, ((sum & 0xF) < (memory.reg8(regX)) & 0xF))
+  memory.setFlag(flags.halfCarry, (sum & 0xF) < (memory.reg8(regX) & 0xF))
   memory.setFlag(flags.carry,(sum > 0xFF))
   memory.setReg8(regX, sum)
   memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
@@ -312,21 +312,22 @@ export function SUB_X_mYZ(regX, regY, regZ, memory){
 
 export function SBC_X_Y(regX, regY, memory){
   const sum = memory.reg8(regX) - memory.reg8(regY) - ((memory.flag(flags.carry)) ? 1 : 0)
-  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) - (memory.reg8(regY) & 0xF) - (memory.flag(flags.carry)? 1 : 0) > 0xF) < 0)
-  memory.setFlag(flags.carry,(sum < 0))
+  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) - (memory.reg8(regY) & 0xF) - (memory.flag(flags.carry)? 1 : 0)) < 0)
+  memory.setFlag(flags.carry,sum < 0)
   memory.setReg8(regX, sum)
-  memory.setFlag(flags.zero, (sum === 0))
+  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
   memory.setFlag(flags.subtract, true)
   memory.setLastInstructionClock(1)
 }
 
 export function SBC_X_mYZ(regX, regY, regZ, memory){
   const addr = (memory.reg8(regY)<<8)|memory.reg8(regZ)
-  const sum = memory.reg8(regX) - memory.readByte(addr) - ((memory.flag(flags.carry)) ? 1 : 0)
-  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) - (memory.reg8(regY) & 0xF) - (memory.flag(flags.carry)? 1 : 0)) < 0)
-  memory.setFlag(flags.carry,(sum < 0))
+  const tmp =  memory.readByte(addr)
+  const sum = memory.reg8(regX) - tmp - (memory.flag(flags.carry) ? 1 : 0)
+  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) - (tmp & 0xF) - (memory.flag(flags.carry)? 1 : 0)) < 0)
+  memory.setFlag(flags.carry,sum < 0)
   memory.setReg8(regX, sum)
-  memory.setFlag(flags.zero, (sum === 0))
+  memory.setFlag(flags.zero, memory.reg8(regX) === 0)
   memory.setFlag(flags.subtract, true)
   memory.setLastInstructionClock(2)
 }
@@ -422,6 +423,17 @@ export function POP_X_Y(regX, regY, memory){
   memory.setReg8(regY, memory.readByte(memory.SP()))
   memory.setReg8(regX, memory.readByte(memory.SP()+1))
   memory.setSP(memory.SP()+2)
+  memory.setLastInstructionClock(3)
+}
+
+export function POP_AF(memory){
+  var tmp = memory.readByte(memory.SP())
+	memory.setFlag(flags.zero, tmp > 0x7F)
+	memory.setFlag(flags.subtract, ((tmp & 0x40) === 0x40))
+	memory.setFlag(flags.halfCarry, ((tmp & 0x20) === 0x20))
+	memory.setFlag(flags.carry, ((tmp & 0x10) === 0x10))
+	memory.setReg8(reg8.A, memory.readByte(memory.SP()+1))
+	memory.setSP(memory.SP()+2)
   memory.setLastInstructionClock(3)
 }
 
@@ -549,11 +561,11 @@ export function RETI(memory){
 export function SBC_X_d8(regX, memory){
   const tmp = memory.readByte(memory.PC())
   memory.setPC(memory.PC() + 1)
-  const sum = memory.reg8(regX) - tmp - ((memory.flag(flags.carry)) ? 1 : 0)
-  memory.setFlag(flags.halfCarry, (memory.reg8(regX) & 0xF) - (tmp & 0xF) - ((memory.flag(flags.carry)) ? 1 : 0) < 0)
+  const sum = memory.reg8(regX) - tmp - (memory.flag(flags.carry) ? 1 : 0)
+  memory.setFlag(flags.halfCarry, ((memory.reg8(regX) & 0xF) - (tmp & 0xF) - (memory.flag(flags.carry) ? 1 : 0)) < 0)
   memory.setFlag(flags.carry, sum < 0)
   memory.setReg8(regX, sum)
-  memory.setFlag(flags.zero, (memory.reg8(regX) === 0))
+  memory.setFlag(flags.zero, memory.reg8(regX) === 0)
   memory.setFlag(flags.subtract, true)
   memory.setLastInstructionClock(2)
 }
