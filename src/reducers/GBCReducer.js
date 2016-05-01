@@ -1,5 +1,6 @@
 import {STEP_FORWARD_CYCLE,STEP_BACKWARD_CYCLE, SHOW_MEMORY_DUMP, PLAY, STOP, CHANGE_SPEED, CHANGE_THRESHOLD, LOAD_ROM, SET_PC, KEY_UP, KEY_DOWN} from '../actions/GBCActions'
 import {default as Memory, reg8, flags} from '../gbc/MemoryInterceptor'
+import {RST_40} from '../gbc/OperationCodes'
 import {OperationCodesMapping as opcodes} from '../gbc/OperationCodesMapping'
 import {step} from '../gbc/CPU'
 
@@ -17,6 +18,7 @@ initMemory.setReg8(reg8.H, 0x01)
 initMemory.setReg8(reg8.L, 0x4D)
 initMemory.setReg8(reg8.F, 0xB0)
 initMemory.setPC(0x00)
+initMemory.setFlag(flags.interruptMasterEnabled, true)
 
 const maxHistory = 200
 const initialState = {
@@ -116,6 +118,7 @@ const onScanLine = (memory) =>{
 
 const onVBlank = (memory)=>{
   canvas.putImageData(memory.screenDataObj(), 0, 0)
+  memory.setInterruptFlags(0x01)
 }
 
 export default function GBCReducer(state = initialState, action) {
@@ -136,7 +139,7 @@ export default function GBCReducer(state = initialState, action) {
     case STEP_FORWARD_CYCLE:
       memory = state.currentMemory.clone()
       for(let i=0; i < state.playingThreshold; ++i){
-        step(opcodes, memory, onScanLine, onVBlank)
+        step(opcodes,RST_40, memory, onScanLine, onVBlank)
       }
       history = [...state.history, state.currentMemory]
       if(history.length>maxHistory){

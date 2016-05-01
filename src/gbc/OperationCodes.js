@@ -554,7 +554,8 @@ export function SUB_X_d8(regX, memory){
 export function RETI(memory){
   memory.setPC((memory.readByte((memory.SP() + 1) & 0xFFFF) << 8) | memory.readByte(memory.SP()))
   memory.setSP(memory.SP() + 2)
-  memory.setIRQEnableDelay((memory.IRQEnableDelay() === 2 || memory.readByte(memory.PC()) === 0x76) ? 1 : 2)
+  memory.setFlag(flags.interruptMasterEnabled, true)
+  //memory.setIRQEnableDelay((memory.IRQEnableDelay() === 2 || memory.readByte(memory.PC()) === 0x76) ? 1 : 2)
   memory.setLastInstructionClock(4)
 }
 
@@ -638,7 +639,7 @@ export function LD_X_mY(regX, regY, memory){
 
 export function DI(memory){
   memory.setFlag(flags.ime, false)
-  memory.setIRQEnableDelay(0)
+  memory.setFlag(flags.interruptMasterEnabled, false)
   memory.setLastInstructionClock(1)
 }
 
@@ -678,7 +679,8 @@ export function LD_X_ma16(regX, memory){
 }
 
 export function EI(memory){
-  memory.setIRQEnableDelay((memory.IRQEnableDelay() === 2 || memory.readByte(memory.PC()) === 0x76) ? 1 : 2)
+  //memory.setIRQEnableDelay((memory.IRQEnableDelay() === 2 || memory.readByte(memory.PC()) === 0x76) ? 1 : 2)
+  memory.setFlag(flags.interruptMasterEnabled, true)
   memory.setLastInstructionClock(1)
 }
 
@@ -690,4 +692,16 @@ export function CP_X_d8(regX, memory){
   memory.setFlag(flags.zero, (sum === 0))
   memory.setFlag(flags.subtract, true)
   memory.setLastInstructionClock(2)
+}
+
+export function RST_40(memory){
+  memory.setFlag(flags.interruptMasterEnabled, false)
+
+  memory.setSP(memory.SP() - 1)
+  memory.writeByte(memory.SP(), memory.PC() >> 8)
+  memory.setSP(memory.SP() - 1)
+  memory.writeByte(memory.SP(), memory.PC())
+
+  memory.setPC(0x0040)
+  memory.setLastInstructionClock(3)
 }

@@ -85,25 +85,30 @@ function createMemoryInterceptor(memory){
         //io stuff
         if(addr === 0xFF00){ //keys
           switch(interceptedMemory.inputColumn()){
-	           case 0x10: return memory.keyState()[0]
-	           case 0x20: return memory.keyState()[1]
+	           case 0x10: return interceptedMemory.keyState()[0]
+	           case 0x20: return interceptedMemory.keyState()[1]
 	           default: return 0;
 	        }
+        } else if(addr === 0xFF0F){
+          return interceptedMemory.interruptFlags()
         } else if(addr === 0xFF40){
-            return (memory.flag(flags.switchbg)? 0x01:0x00) |
-              (memory.flag(flags.bgmap) ? 0x08 : 0x00) |
-              (memory.flag(flags.bgtile) ? 0x10 : 0x00) |
-              (memory.flag(flags.switchlcd) ? 0x80 : 0x00)
+            return (interceptedMemory.flag(flags.switchbg)? 0x01:0x00) |
+              (interceptedMemory.flag(flags.bgmap) ? 0x08 : 0x00) |
+              (interceptedMemory.flag(flags.bgtile) ? 0x10 : 0x00) |
+              (interceptedMemory.flag(flags.switchlcd) ? 0x80 : 0x00)
         } else if(addr === 0xFF42) {
-            return memory.GPUScrollY()
+          return interceptedMemory.GPUScrollY()
         } else if(addr === 0xFF43){
-            return memory.GPUScrollX()
+          return interceptedMemory.GPUScrollX()
         } else if(addr === 0xFF44){
-            return memory.GPULine()
+          return interceptedMemory.GPULine()
+        } else if(addr === 0xFFFF){
+			    return interceptedMemory.interruptEnabled()
         } else {
           //console.log('unsupported read', addr.toString(16))
         }
       }
+
       return interceptedMemory.readByte(addr)
     },
     writeByte(addr, value){
@@ -113,27 +118,31 @@ function createMemoryInterceptor(memory){
         return;
       } else if((addr & 0xFF00) === 0xFF00){
         if(addr === 0xFF00){//keys
-          memory.setInputColumn(value & 0x30)
+          interceptedMemory.setInputColumn(value & 0x30)
+        } else if(addr === 0xFF0F){
+          interceptedMemory.setInterruptFlags(value)
         } else if(addr === 0xFF40){
-          memory.setFlag(flags.switchbg, (value & 0x01) ? true : false)
-          memory.setFlag(flags.bgmap, (value & 0x08) ? true : false)
-          memory.setFlag(flags.bgtile, (value & 0x10) ? true : false)
-          memory.setFlag(flags.switchlcd, (value & 0x80) ? true : false)
+          interceptedMemory.setFlag(flags.switchbg, (value & 0x01) ? true : false)
+          interceptedMemory.setFlag(flags.bgmap, (value & 0x08) ? true : false)
+          interceptedMemory.setFlag(flags.bgtile, (value & 0x10) ? true : false)
+          interceptedMemory.setFlag(flags.switchlcd, (value & 0x80) ? true : false)
         } else if(addr === 0xFF42){
-          memory.setGPUScrollY(value)
+          interceptedMemory.setGPUScrollY(value)
         } else if(addr === 0xFF43){
-          memory.setGPUScrollX(value)
+          interceptedMemory.setGPUScrollX(value)
         } else if(addr === 0xFF46){
           console.log('writing ', addr, value)
         } else if(addr === 0xFF47){
           for(let i=0; i < 4; ++i){
             switch((value >> (i * 2)) & 3){
-              case 0 : memory.setGPUPallete(i, [255,255,255,255]); break
-              case 1 : memory.setGPUPallete(i, [192,192,192,255]); break
-              case 2 : memory.setGPUPallete(i, [96, 96, 96, 255]); break
-              case 3 : memory.setGPUPallete(i, [0, 0, 0, 255]); break
+              case 0 : interceptedMemory.setGPUPallete(i, [255,255,255,255]); break
+              case 1 : interceptedMemory.setGPUPallete(i, [192,192,192,255]); break
+              case 2 : interceptedMemory.setGPUPallete(i, [96, 96, 96, 255]); break
+              case 3 : interceptedMemory.setGPUPallete(i, [0, 0, 0, 255]); break
             }
           }
+        } else if(addr === 0xFFFF){
+			    interceptedMemory.setInterruptEnabled(value)
         } else {
           //console.log('unsuported write', addr.toString(16), ' ', value.toString(16))
         }
@@ -222,11 +231,17 @@ function createMemoryInterceptor(memory){
     setGPUBGTile(value){
       interceptedMemory.setGPUBGTile(value)
     },
-    IRQEnableDelay(){
-      return interceptedMemory.IRQEnableDelay
+    interruptFlags(){
+      interceptedMemory.interruptFlags()
     },
-    setIRQEnableDelay(value){
-      interceptedMemory.setIRQEnableDelay(value)
+    setInterruptFlags(value){
+      interceptedMemory.setInterruptFlags(value)
+    },
+    interruptEnabled(){
+      interceptedMemory.interruptEnabled()
+    },
+    setInterruptEnabled(value){
+      interceptedMemory.setInterruptEnabled(value)
     },
     tilesetData(tile, x, y){
       return interceptedMemory.tilesetData(tile, x, y)

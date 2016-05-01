@@ -52,26 +52,25 @@ const formatHex = (val) => {
   return ("0" + num).slice(-2)
 }
 
-export function step(opcodes,memory, onScanLine, onVBlank){
+export function step(opcodes, rst40, memory, onScanLine, onVBlank){
     const pc = memory.PC()
     if(pc === 0x24){
       console.log('messing with demo')
     }
-    //console.log(memory.readByte(pc))
-    /*console.log(formatHex(pc),memory.SP().toString(16).toUpperCase(),
-      formatHex(memory.reg8(reg8.A)),
-      formatHex(memory.reg8(reg8.B)),
-      formatHex(memory.reg8(reg8.C)),
-      formatHex(memory.reg8(reg8.D)),
-      formatHex(memory.reg8(reg8.E)),
-      formatHex(memory.reg8(reg8.H)),
-      formatHex(memory.reg8(reg8.L)),
-      formatHex(memory.reg8(reg8.F)),
-      formatHex(memory.clock()))*/
     const addr = memory.readByte( pc )
     const instr = opcodes[addr]
     memory.setPC(memory.PC() + 1)
     instr(memory)
+
+    if(memory.flag(flags.interruptMasterEnabled) && memory.interruptEnabled() && memory.interruptFlags()){
+      const ifired = memory.interruptEnabled() & memory.interruptFlags()
+
+    	if(ifired & 0x01){
+    	  memory.setInterruptFlags(memory.interruptFlags() & (255 - 0x01))
+    	  rst40(memory)
+    	}
+    }
+
     memory.setClock(memory.clock()+memory.lastInstructionClock())
     stepGPU(opcodes, memory, onScanLine, onVBlank)
 }

@@ -50,6 +50,7 @@ export const flags = {
   illegal: [0x10011, 0x20],
   ime: [0x10011, 0x10],
   isOutOfBios:[0x10011, 0x08],
+  interruptMasterEnabled: [0x10011, 0x04],
 
   switchbg:[0x10022, 0x80],
   bgmap:[0x10022, 0x40],
@@ -64,7 +65,7 @@ const HLMapping = 0x10005
 const lastInstructionClockMapping = 0x1000C
 const clockMapping = 0x1000D
 
-const IRQEnableDelayMapping = 0x10012
+const interruptFlagsMapping = 0x10012
 
 const gpuClockMapping = 0x10013
 const gpuModeMapping = 0x10017
@@ -74,6 +75,7 @@ const gpuScrollYMapping = 0x10020
 const gpuBGTileMapping = 0x10021
 const keyboardMapping = 0x10022
 const inputColumnMapping = 0x10024
+const interruptEnabledMapping = 0x10026
 const gpuPalleteMapping = 0x10030
 
 function createMemory(canvas, buffer, tileset, screenBuffer){
@@ -197,11 +199,17 @@ function createMemory(canvas, buffer, tileset, screenBuffer){
       byteView[gpuPalleteMapping+(index*4)+2] = value[2]
       byteView[gpuPalleteMapping+(index*4)+3] = value[3]
     },
-    IRQEnableDelay(){
-      return byteView[IRQEnableDelayMapping]
+    interruptFlags(){
+      return byteView[interruptFlagsMapping]
     },
-    setIRQEnableDelay(value){
-      byteView[IRQEnableDelayMapping] = value
+    setInterruptFlags(value){
+      byteView[interruptFlagsMapping] = value
+    },
+    interruptEnabled(){
+      return byteView[interruptEnabledMapping]
+    },
+    setInterruptEnabled(value){
+      byteView[interruptEnabledMapping] = value
     },
     tilesetData(tile, x, y){
       return tileset[tile][y][x]
