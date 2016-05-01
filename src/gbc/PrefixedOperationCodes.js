@@ -22,8 +22,8 @@ export function RLC_mXY(regX, regY, memory){
 }
 
 export function RRC_X(regX, memory){
-  memory.setFlag(flags.carry,(((memory.reg8(regX) & 0x01) === 0x01)))
-  memory.setReg8(regX,((memory.flag(flags.carry))) ? 0x80 : 0) | (memory.reg8(regX) >> 1);
+  memory.setFlag(flags.carry,(memory.reg8(regX) & 0x01) === 0x01)
+  memory.setReg8(regX,(memory.flag(flags.carry) ? 0x80 : 0) | (memory.reg8(regX) >> 1))
   memory.setFlag(flags.halfCarry, false)
   memory.setFlag(flags.subtract, false)
   memory.setFlag(flags.zero, (memory.reg8(regX)) === 0)
@@ -98,10 +98,10 @@ export function SLA_X(regX, memory){
 }
 
 export function SLA_mXY(regX, regY, memory){
-  const addr = memory.reg8(regX)<<8 | memory.reg8(regY)
+  const addr = (memory.reg8(regX)<<8) | memory.reg8(regY)
   let tmp = memory.readByte(addr)
-  memory.setFlag(flags.carry, (tmp > 0x7F))
-  tmp = (tmp << 1)
+  memory.setFlag(flags.carry, tmp > 0x7F)
+  tmp = (tmp << 1) & 0xFF
   memory.writeByte(addr, tmp)
   memory.setFlag(flags.halfCarry, false)
   memory.setFlag(flags.subtract, false)

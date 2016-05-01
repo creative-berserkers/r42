@@ -137,7 +137,17 @@ export default {
         <div class="form-group">
           <button type="button" class="btn btn-default" onClick={onLoadROMClicked(dispatch, context, 'opus5.gb')} disabled={context.playing}>Load test opus5 test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '01-special.gb')} disabled={context.playing}>Load test 01-special test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '02-interrupts.gb')} disabled={context.playing}>Load test 02-interrupts test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '03-op sp,hl.gb')} disabled={context.playing}>Load test 03-op sp,hl test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '04-op r,imm.gb')} disabled={context.playing}>Load test 04-op r,imm test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '05-op rp.gb')} disabled={context.playing}>Load test 05-op rp test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '06-ld r,r.gb')} disabled={context.playing}>Load test 06-ld r,r test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '07-jr,jp,call,ret,rst.gb')} disabled={context.playing}>Load test 07-jr,jp,call,ret,rst test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '08-misc instrs.gb')} disabled={context.playing}>Load test 08-misc instrs test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '09-op r,r.gb')} disabled={context.playing}>Load test 09-op r,r test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '10-bit ops.gb')} disabled={context.playing}>Load test 10-bit ops test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '11-op a,(hl).gb')} disabled={context.playing}>Load test 11-op a,(hl) test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'adjtris.gb')} disabled={context.playing}>Load test adjtris test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'ttt.gb')} disabled={context.playing}>Load test ttt</button>
         </div>
         <div class="form-group">
