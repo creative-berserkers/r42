@@ -1,24 +1,10 @@
-import Application from './Application'
-import {createApp, element} from 'deku'
-import {createStore, applyMiddleware} from 'redux'
-import GBCReducer from '../reducers/GBCReducer'
+'use strict'
+const Application = require('./Application')
+const {createApp, element} = require('deku')
+const {createStore, applyMiddleware} = require('redux')
+const GameReducer = require('../reducers/GameReducer')
 
-let canvas = document.getElementById('display')
-
-const canvasRenderer = store => next => action => {
-  //console.log('dispatching', action)
-  let result = next(action)
-  //console.log('next state', store.getState())
-  // render to canvas
-  //var ctx = canvas.getContext("2d");
-
-  //ctx.fillStyle = "green";
-  //ctx.fillRect(10, 10, 100, 100);
-
-  return result
-}
-
-const store = createStore(GBCReducer, applyMiddleware(canvasRenderer))
+const store = createStore(GameReducer)
 const render = createApp(document.getElementById('mount'), store.dispatch)
 
 // Rendering function

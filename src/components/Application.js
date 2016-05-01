@@ -1,12 +1,16 @@
-import {element} from 'deku'
-import GBC from './GBC'
+'use strict'
+const {element} = require('deku')
+const BoardView = require('./BoardView')
 
-export default {
-  render() {
+let handleClick = (x,y) => {
+  console.log(x,y)
+}
+
+module.exports = {
+  render({context}) {
     return (
         <div>
-          <p>GBC Emulator</p>
-          <GBC></GBC>
+          <BoardView board={context.board} onClick={handleClick}></BoardView>
         </div>
     )
   }
