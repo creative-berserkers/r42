@@ -19,7 +19,7 @@ initMemory.setReg8(reg8.L, 0x4D)
 initMemory.setReg8(reg8.F, 0xB0)
 initMemory.setPC(0x100)
 initMemory.setFlag(flags.interruptMasterEnabled, true)
-
+initMemory.setFlag(flags.halt, false)
 const maxHistory = 200
 const initialState = {
     history: [],

@@ -47,6 +47,48 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
     }
 }
 
+export function stepTimer(memory){
+  memory.setTimerDIVStep(memory.timerDIVStep() + memory.lastInstructionClock())
+  if(memory.timerDIVStep() >= 64){
+    memory.setTimerDIVStep(memory.timerDIVStep() - 64)
+    memory.setTimerDIV(memory.timerDIV() + 1)
+  }
+
+  memory.setTimerTIMAStep(memory.timerTIMAStep() + memory.lastInstructionClock())
+  if(memory.timerTAC() & 4){
+    const threshold = speed[memory.timerTAC() & 3]
+    if(memory.timerTIMAStep() >= threshold){
+      memory.setTimerTIMAStep(memory.timerTIMAStep() - threshold)
+      memory.setTimerTIMA(memory.timerTIMA() + 1)
+      if(memory.timerTIMA() === 0){
+        memory.setTimerTIMA(memory.timerTMA())
+        memory.setInterruptFlags(memory.interruptFlags() | 4)
+      }
+    }
+  }
+}
+
+export function handleInterrupts(rst40, memory){
+  const ifired = memory.interruptEnabled() & memory.interruptFlags()
+  if(memory.flag(flags.interruptMasterEnabled) && ifired !== 0){
+
+    if(memory.flag(flags.halt) === true){
+      memory.setFlag(flags.halt, false)
+    }
+
+    for(let i=0;i<5;++i){
+      let bit = (0x01 << i)
+      if((ifired & bit) === 0)
+        continue;
+
+      memory.setFlag(flags.interruptMasterEnabled, false)
+      memory.setInterruptFlags(memory.interruptFlags() & ~bit)
+      rst40(i*8, memory)
+      break
+    }
+  }
+}
+
 const formatHex = (val) => {
   let num = val.toString(16).toUpperCase()
   return ("0" + num).slice(-2)
@@ -55,51 +97,22 @@ const formatHex = (val) => {
 const speed = [64, 1, 4 , 16]
 
 export function step(opcodes, rst40, memory, onScanLine, onVBlank){
-    const pc = memory.PC()
-    if(pc === 0x24){
-      console.log('messing with demo')
+    if(!memory.flag(flags.halt)){
+      const pc = memory.PC()
+      const addr = memory.readByte( pc )
+      const instr = opcodes[addr]
+      memory.setPC(memory.PC() + 1)
+      instr(memory)
+    } else {
+      memory.setLastInstructionClock(1)
     }
-    const addr = memory.readByte( pc )
-    const instr = opcodes[addr]
-    memory.setPC(memory.PC() + 1)
-    instr(memory)
 
+    stepTimer(memory)
 
-    const ifired = memory.interruptEnabled() & memory.interruptFlags()
-    if(memory.flag(flags.interruptMasterEnabled) && ifired !== 0){
-
-      for(let i=0;i<5;++i){
-        let bit = (0x01 << i)
-        if((ifired & bit) === 0)
-          continue;
-
-        memory.setFlag(flags.interruptMasterEnabled, false)
-        memory.setInterruptFlags(memory.interruptFlags() & ~bit)
-        rst40(i*8, memory)
-        break
-      }
-    }
+    handleInterrupts(rst40, memory)
 
     memory.setClock(memory.clock()+memory.lastInstructionClock())
     stepGPU(opcodes, memory, onScanLine, onVBlank)
-
-    memory.setTimerDIVStep(memory.timerDIVStep() + memory.lastInstructionClock())
-    if(memory.timerDIVStep() >= 64){
-      memory.setTimerDIVStep(memory.timerDIVStep() - 64)
-      memory.setTimerDIV(memory.timerDIV() + 1)
-    }
-
-    if(memory.timerTAC() & 4){
-      const threshold = speed[memory.timerTAC() & 3]
-      if(memory.timerTIMAStep() >= threshold){
-        memory.setTimerTIMAStep(memory.timerTIMAStep() - threshold)
-        memory.setTimerTIMA(memory.timerTIMA() + 1)
-        if(memory.timerTIMA() === 0){
-          memory.setTimerTIMA(memory.timerTMA())
-          memory.setInterruptFlags(memory.interruptFlags() | 4)
-        }
-      }
-    }
 }
 
 export function stepUntilVBlank(opcodes, memory){
