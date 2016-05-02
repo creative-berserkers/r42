@@ -65,9 +65,6 @@ const HLMapping = 0x10005
 const lastInstructionClockMapping = 0x1000C
 const clockMapping = 0x1000D
 
-const interruptFlagsMapping = 0xFF0F
-const interruptEnabledMapping = 0xFFFF
-
 const gpuClockMapping = 0x10013
 const gpuModeMapping = 0x10017
 const gpuLineMapping = 0x10018
@@ -77,7 +74,18 @@ const gpuBGTileMapping = 0x10021
 const keyboardMapping = 0x10022
 const inputColumnMapping = 0x10024
 
+const timerDIVStepMapping = 0x10025
+const timerTIMAStepMapping = 0x10026
+
 const gpuPalleteMapping = 0x10030
+
+const interruptFlagsMapping = 0xFF0F
+const interruptEnabledMapping = 0xFFFF
+
+const timerDIVMapping = 0xFF04
+const timerTIMAMapping = 0xFF05
+const timerTMAMapping = 0xFF06
+const timerTACMapping = 0xFF07
 
 function createMemory(canvas, buffer, tileset, screenBuffer){
   if(buffer.byteLength != expectedBufferSize){
@@ -157,6 +165,42 @@ function createMemory(canvas, buffer, tileset, screenBuffer){
         byteView[gpuClockMapping+1] = (value>>16)
         byteView[gpuClockMapping+2] = (value>>8)
         byteView[gpuClockMapping+3] = (value)
+    },
+    timerDIV(){
+      return byteView[timerDIVMapping]
+    },
+    setTimerDIV(value){
+      byteView[timerDIVMapping] = value
+    },
+    timerDIVStep(){
+      return byteView[timerDIVStepMapping]
+    },
+    setTimerDIVStep(value){
+      byteView[timerDIVStepMapping] = value
+    },
+    timerTIMA(){
+      return byteView[timerTIMAMapping]
+    },
+    setTimerTIMA(value){
+      byteView[timerTIMAMapping] = value
+    },
+    timerTIMAStep(){
+      return byteView[timerTIMAStepMapping]
+    },
+    setTimerTIMAStep(value){
+      byteView[timerTIMAStepMapping] = value
+    },
+    timerTMA(){
+      return byteView[timerTMAMapping]
+    },
+    setTimerTMA(value){
+      byteView[timerTMAMapping] = value
+    },
+    timerTAC(){
+      return byteView[timerTACMapping]
+    },
+    setTimerTAC(value){
+      byteView[timerTACMapping] = value
     },
     lastInstructionClock(){
       return byteView[lastInstructionClockMapping]

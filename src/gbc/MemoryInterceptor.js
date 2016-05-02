@@ -89,8 +89,6 @@ function createMemoryInterceptor(memory){
 	           case 0x20: return interceptedMemory.keyState()[1]
 	           default: return 0;
 	        }
-        } else if(addr === 0xFF0F){
-          return interceptedMemory.interruptFlags()
         } else if(addr === 0xFF40){
             return (interceptedMemory.flag(flags.switchbg)? 0x01:0x00) |
               (interceptedMemory.flag(flags.bgmap) ? 0x08 : 0x00) |
@@ -102,8 +100,6 @@ function createMemoryInterceptor(memory){
           return interceptedMemory.GPUScrollX()
         } else if(addr === 0xFF44){
           return interceptedMemory.GPULine()
-        } else if(addr === 0xFFFF){
-			    return interceptedMemory.interruptEnabled()
         } else {
           //console.log('unsupported read', addr.toString(16))
         }
@@ -119,8 +115,10 @@ function createMemoryInterceptor(memory){
       } else if((addr & 0xFF00) === 0xFF00){
         if(addr === 0xFF00){//keys
           interceptedMemory.setInputColumn(value & 0x30)
-        } else if(addr === 0xFF0F){
-          interceptedMemory.setInterruptFlags(value)
+        } else if(addr === 0xFF04){
+          interceptedMemory.writeByte(addr, 0x00)
+        } else if(addr === 0xFF07){
+          interceptedMemory.writeByte(addr, value & 7)
         } else if(addr === 0xFF40){
           interceptedMemory.setFlag(flags.switchbg, (value & 0x01) ? true : false)
           interceptedMemory.setFlag(flags.bgmap, (value & 0x08) ? true : false)
@@ -141,8 +139,6 @@ function createMemoryInterceptor(memory){
               case 3 : interceptedMemory.setGPUPallete(i, [0, 0, 0, 255]); break
             }
           }
-        } else if(addr === 0xFFFF){
-			    interceptedMemory.setInterruptEnabled(value)
         } else {
           //console.log('unsuported write', addr.toString(16), ' ', value.toString(16))
         }
@@ -189,6 +185,42 @@ function createMemoryInterceptor(memory){
     setGPUClock(value){
         interceptedMemory.setGPUClock(value)
     },
+    timerDIV(){
+      return interceptedMemory.timerDIV()
+    },
+    setTimerDIV(value){
+      interceptedMemory.setTimerDIV(value)
+    },
+    timerDIVStep(){
+      return interceptedMemory.timerDIVStep()
+    },
+    setTimerDIVStep(value){
+      interceptedMemory.setTimerDIVStep(value)
+    },
+    timerTIMA(){
+      return interceptedMemory.timerTIMA()
+    },
+    setTimerTIMA(value){
+      interceptedMemory.setTimerTIMA(value)
+    },
+    timerTIMAStep(){
+      return interceptedMemory.timerTIMAStep()
+    },
+    setTimerTIMAStep(value){
+      interceptedMemory.setTimerTIMAStep(value)
+    },
+    timerTMA(){
+      return interceptedMemory.timerTMA()
+    },
+    setTimerTMA(value){
+      interceptedMemory.setTimerTMA(value)
+    },
+    timerTAC(){
+      return interceptedMemory.timerTAC()
+    },
+    setTimerTAC(value){
+      interceptedMemory.setTimerTAC(value)
+    },
     lastInstructionClock(){
       return interceptedMemory.lastInstructionClock()
     },
@@ -232,13 +264,13 @@ function createMemoryInterceptor(memory){
       interceptedMemory.setGPUBGTile(value)
     },
     interruptFlags(){
-      interceptedMemory.interruptFlags()
+      return interceptedMemory.interruptFlags()
     },
     setInterruptFlags(value){
       interceptedMemory.setInterruptFlags(value)
     },
     interruptEnabled(){
-      interceptedMemory.interruptEnabled()
+      return interceptedMemory.interruptEnabled()
     },
     setInterruptEnabled(value){
       interceptedMemory.setInterruptEnabled(value)

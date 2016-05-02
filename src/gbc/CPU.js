@@ -52,6 +52,8 @@ const formatHex = (val) => {
   return ("0" + num).slice(-2)
 }
 
+const speed = [64, 1, 4 , 16]
+
 export function step(opcodes, rst40, memory, onScanLine, onVBlank){
     const pc = memory.PC()
     if(pc === 0x24){
@@ -80,6 +82,24 @@ export function step(opcodes, rst40, memory, onScanLine, onVBlank){
 
     memory.setClock(memory.clock()+memory.lastInstructionClock())
     stepGPU(opcodes, memory, onScanLine, onVBlank)
+
+    memory.setTimerDIVStep(memory.timerDIVStep() + memory.lastInstructionClock())
+    if(memory.timerDIVStep() >= 64){
+      memory.setTimerDIVStep(memory.timerDIVStep() - 64)
+      memory.setTimerDIV(memory.timerDIV() + 1)
+    }
+
+    if(memory.timerTAC() & 4){
+      const threshold = speed[memory.timerTAC() & 3]
+      if(memory.timerTIMAStep() >= threshold){
+        memory.setTimerTIMAStep(memory.timerTIMAStep() - threshold)
+        memory.setTimerTIMA(memory.timerTIMA() + 1)
+        if(memory.timerTIMA() === 0){
+          memory.setTimerTIMA(memory.timerTMA())
+          memory.setInterruptFlags(memory.interruptFlags() | 4)
+        }
+      }
+    }
 }
 
 export function stepUntilVBlank(opcodes, memory){
