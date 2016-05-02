@@ -65,7 +65,8 @@ const HLMapping = 0x10005
 const lastInstructionClockMapping = 0x1000C
 const clockMapping = 0x1000D
 
-const interruptFlagsMapping = 0x10012
+const interruptFlagsMapping = 0xFF0F
+const interruptEnabledMapping = 0xFFFF
 
 const gpuClockMapping = 0x10013
 const gpuModeMapping = 0x10017
@@ -75,7 +76,7 @@ const gpuScrollYMapping = 0x10020
 const gpuBGTileMapping = 0x10021
 const keyboardMapping = 0x10022
 const inputColumnMapping = 0x10024
-const interruptEnabledMapping = 0x10026
+
 const gpuPalleteMapping = 0x10030
 
 function createMemory(canvas, buffer, tileset, screenBuffer){
