@@ -65,10 +65,13 @@ export function step(opcodes, rst40, memory, onScanLine, onVBlank){
     if(memory.flag(flags.interruptMasterEnabled) && memory.interruptEnabled() && memory.interruptFlags()){
       const ifired = memory.interruptEnabled() & memory.interruptFlags()
 
-    	if(ifired & 0x01){
-    	  memory.setInterruptFlags(memory.interruptFlags() & (255 - 0x01))
-    	  rst40(memory)
-    	}
+      for(let i=0;i<5;++i){
+        let bit = (0x01 << i)
+        if(ifired & bit){
+      	  memory.setInterruptFlags(memory.interruptFlags() & (255 - bit))
+      	  rst40(bit*8, memory)
+      	}
+      }
     }
 
     memory.setClock(memory.clock()+memory.lastInstructionClock())

@@ -694,7 +694,7 @@ export function CP_X_d8(regX, memory){
   memory.setLastInstructionClock(2)
 }
 
-export function RST_40(memory){
+export function RST_40(offset, memory){
   memory.setFlag(flags.interruptMasterEnabled, false)
 
   memory.setSP(memory.SP() - 1)
@@ -702,6 +702,6 @@ export function RST_40(memory){
   memory.setSP(memory.SP() - 1)
   memory.writeByte(memory.SP(), memory.PC())
 
-  memory.setPC(0x0040)
+  memory.setPC(0x0040+offset)
   memory.setLastInstructionClock(3)
 }
