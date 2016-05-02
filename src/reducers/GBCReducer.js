@@ -17,7 +17,7 @@ initMemory.setReg8(reg8.E, 0xD8)
 initMemory.setReg8(reg8.H, 0x01)
 initMemory.setReg8(reg8.L, 0x4D)
 initMemory.setReg8(reg8.F, 0xB0)
-initMemory.setPC(0x00)
+initMemory.setPC(0x100)
 initMemory.setFlag(flags.interruptMasterEnabled, true)
 
 const maxHistory = 200
@@ -26,8 +26,8 @@ const initialState = {
     currentMemory : initMemory,
     showMemoryDump: false,
     playing: false,
-    playingSpeed: 1,
-    playingThreshold: 1
+    playingSpeed: 100,
+    playingThreshold: 10000
 }
 
 const onScanLine = (memory) =>{
