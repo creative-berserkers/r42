@@ -94,14 +94,18 @@ function createMemoryInterceptor(memory){
               (interceptedMemory.flag(flags.bgmap) ? 0x08 : 0x00) |
               (interceptedMemory.flag(flags.bgtile) ? 0x10 : 0x00) |
               (interceptedMemory.flag(flags.switchlcd) ? 0x80 : 0x00)
+        } else if(addr === 0xFF41) {
+            return 4
         } else if(addr === 0xFF42) {
           return interceptedMemory.GPUScrollY()
         } else if(addr === 0xFF43){
           return interceptedMemory.GPUScrollX()
         } else if(addr === 0xFF44){
           return interceptedMemory.GPULine()
+        } else if(addr < 0xFFFE && addr > 0xFF80){
+          //stack
         } else {
-          //console.log('unsupported read', addr.toString(16))
+          console.log('unsupported read', addr.toString(16))
         }
       }
 
@@ -129,7 +133,7 @@ function createMemoryInterceptor(memory){
         } else if(addr === 0xFF43){
           interceptedMemory.setGPUScrollX(value)
         } else if(addr === 0xFF46){
-          console.log('writing ', addr, value)
+          //console.log('writing ', addr, value)
         } else if(addr === 0xFF47){
           for(let i=0; i < 4; ++i){
             switch((value >> (i * 2)) & 3){
@@ -139,8 +143,10 @@ function createMemoryInterceptor(memory){
               case 3 : interceptedMemory.setGPUPallete(i, [0, 0, 0, 255]); break
             }
           }
+        } else if(addr < 0xFFFE && addr > 0xFF80){
+          //stack
         } else {
-          //console.log('unsuported write', addr.toString(16), ' ', value.toString(16))
+          console.log('unsuported write', addr.toString(16), ' ', value.toString(16))
         }
       }
       interceptedMemory.writeByte(addr, value)

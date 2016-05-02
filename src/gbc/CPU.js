@@ -54,8 +54,9 @@ export function stepTimer(memory){
     memory.setTimerDIV(memory.timerDIV() + 1)
   }
 
-  memory.setTimerTIMAStep(memory.timerTIMAStep() + memory.lastInstructionClock())
+
   if(memory.timerTAC() & 4){
+    memory.setTimerTIMAStep(memory.timerTIMAStep() + memory.lastInstructionClock())
     const threshold = speed[memory.timerTAC() & 3]
     if(memory.timerTIMAStep() >= threshold){
       memory.setTimerTIMAStep(memory.timerTIMAStep() - threshold)
@@ -70,11 +71,12 @@ export function stepTimer(memory){
 
 export function handleInterrupts(rst40, memory){
   const ifired = memory.interruptEnabled() & memory.interruptFlags()
-  if(memory.flag(flags.interruptMasterEnabled) && ifired !== 0){
 
-    if(memory.flag(flags.halt) === true){
-      memory.setFlag(flags.halt, false)
-    }
+  if(ifired !== 0 && memory.flag(flags.halt) === true){
+    memory.setFlag(flags.halt, false)
+  }
+
+  if(memory.flag(flags.interruptMasterEnabled) && ifired !== 0){
 
     for(let i=0;i<5;++i){
       let bit = (0x01 << i)

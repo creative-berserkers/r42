@@ -137,7 +137,10 @@ export default {
         <div class="form-group">
           <button type="button" class="btn btn-default" onClick={onLoadROMClicked(dispatch, context, 'opus5.gb')} disabled={context.playing}>Load test opus5 test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '01-special.gb')} disabled={context.playing}>Load test 01-special test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '01-read_timing.gb')} disabled={context.playing}>Load test 01-read_timing test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '02-interrupts.gb')} disabled={context.playing}>Load test 02-interrupts test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '02-write_timing.gb')} disabled={context.playing}>Load test 02-write_timing test</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '03-modify_timing.gb')} disabled={context.playing}>Load test 03-modify_timing test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '03-op sp,hl.gb')} disabled={context.playing}>Load test 03-op sp,hl test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '04-op r,imm.gb')} disabled={context.playing}>Load test 04-op r,imm test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '05-op rp.gb')} disabled={context.playing}>Load test 05-op rp test</button>
@@ -149,6 +152,10 @@ export default {
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '11-op a,(hl).gb')} disabled={context.playing}>Load test 11-op a,(hl) test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'adjtris.gb')} disabled={context.playing}>Load test adjtris test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'ttt.gb')} disabled={context.playing}>Load test ttt</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'halt_bug.gb')} disabled={context.playing}>Load test halt_bug</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'instr_timing.gb')} disabled={context.playing}>Load test instr_timing</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'interrupt_time.gb')} disabled={context.playing}>Load test interrupt_time</button>
+          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'mem_timing.gb')} disabled={context.playing}>Load test mem_timing</button>
         </div>
         <div class="form-group">
           <button type="button" class="btn btn-default"  onClick={onsetPCClicked(dispatch, context, 0x00)} disabled={context.playing}>Set PC to 0x00</button>
