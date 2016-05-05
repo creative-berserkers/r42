@@ -117,27 +117,35 @@ function createMemoryInterceptor(memory){
       if(((addr & 0xF000) === 0x8000) || ((addr & 0xF000) === 0x9000)){
         interceptedMemory.writeByte(addr, value)
         updateTile(interceptedMemory, addr, value)
-        return;
+        return
       } else if((addr & 0xFF00) === 0xFF00){
         if(addr === 0xFF00){//keys
           interceptedMemory.setInputColumn(value & 0x30)
+          return
         } else if(addr === 0xFF04){
           interceptedMemory.writeByte(addr, 0x00)
+          return
         } else if(addr === 0xFF07){
           interceptedMemory.writeByte(addr, value & 7)
+          return
         } else if(addr === 0xFF40){
           interceptedMemory.setFlag(flags.switchbg, (value & 0x01) ? true : false)
           interceptedMemory.setFlag(flags.bgmap, (value & 0x08) ? true : false)
           interceptedMemory.setFlag(flags.bgtile, (value & 0x10) ? true : false)
           interceptedMemory.setFlag(flags.switchlcd, (value & 0x80) ? true : false)
+          return
         } else if(addr === 0xFF41){
           //console.log('writing 0xFF41 with ',value)
-          interceptedMemory.writeByte(addr, value | 0b11111000)
+          let val1 = (value & 0b11111000)
+          let val2 = (interceptedMemory.readByte(addr) & 0b00000111)
+          interceptedMemory.writeByte(addr, val1 | val2)
           return
         } else if(addr === 0xFF42){
           interceptedMemory.setGPUScrollY(value)
+          return
         } else if(addr === 0xFF43){
           interceptedMemory.setGPUScrollX(value)
+          return
         } else if(addr === 0xFF46){
           //console.log('writing ', addr, value)
         } else if(addr === 0xFF47){
@@ -149,6 +157,7 @@ function createMemoryInterceptor(memory){
               case 3 : interceptedMemory.setGPUPallete(i, [0, 0, 0, 255]); break
             }
           }
+          return
         } else if(addr < 0xFFFE && addr > 0xFF80){
           //stack
         } else {
