@@ -135,6 +135,7 @@ export default {
     return (
       <div>
         <div class="form-group">
+          <button type="button" class="btn btn-default" onClick={onLoadROMClicked(dispatch, context, 'tetris.gb')} disabled={context.playing}>Load tetris</button>
           <button type="button" class="btn btn-default" onClick={onLoadROMClicked(dispatch, context, 'opus5.gb')} disabled={context.playing}>Load test opus5 test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '01-special.gb')} disabled={context.playing}>Load test 01-special test</button>
           <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '01-read_timing.gb')} disabled={context.playing}>Load test 01-read_timing test</button>

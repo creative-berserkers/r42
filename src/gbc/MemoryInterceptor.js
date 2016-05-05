@@ -114,6 +114,10 @@ function createMemoryInterceptor(memory){
       return interceptedMemory.readByte(addr)
     },
     writeByte(addr, value){
+      if(addr < 0x8000){
+        //TODO: handle banking
+        return
+      }
       if(((addr & 0xF000) === 0x8000) || ((addr & 0xF000) === 0x9000)){
         interceptedMemory.writeByte(addr, value)
         updateTile(interceptedMemory, addr, value)

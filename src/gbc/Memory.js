@@ -74,7 +74,7 @@ const gpuScrollYMapping = 0x10020
 const gpuLineCompareMapping = 0xFF45
 const gpuBGTileMapping = 0x10021
 const keyboardMapping = 0x10022
-const inputColumnMapping = 0x10024
+const inputColumnMapping = 0xFF00
 
 const timerDIVStepMapping = 0x10025
 const timerTIMAStepMapping = 0x10026

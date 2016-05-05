@@ -243,6 +243,7 @@ export function LD_X_Y(regX, regY, memory){
 }
 
 export function HALT(memory){
+  console.log('halt')
   memory.setFlag(flags.halt, true)
   memory.setLastInstructionClock(1)
 }

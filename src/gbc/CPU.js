@@ -111,9 +111,9 @@ export function handleInterrupts(rst40, memory){
 
       //console.log('interrupt',(0x40+i*8).toString(16),memory.GPUStat())
 
-      memory.setFlag(flags.interruptMasterEnabled, false)
+      //memory.setFlag(flags.interruptMasterEnabled, false)
       memory.setInterruptFlags(memory.interruptFlags() & ~bit)
-      rst40(i*8, memory)
+      //rst40(i*8, memory)
       break
     }
   }
@@ -126,11 +126,31 @@ const formatHex = (val) => {
 
 const speed = [64, 1, 4 , 16]
 
+const pcRecord = new Array(0xFFFF)
+pcRecord.fill(0)
+
 export function step(opcodes, rst40, memory, onScanLine, onVBlank){
     if(!memory.flag(flags.halt)){
       const pc = memory.PC()
+
       const addr = memory.readByte( pc )
       const instr = opcodes[addr]
+
+      if(pcRecord[pc] === 0){
+        console.log(pc.toString(16),addr.toString(16),
+          memory.reg8(reg8.A).toString(16),
+          memory.reg8(reg8.B).toString(16),
+          memory.reg8(reg8.C).toString(16),
+          memory.reg8(reg8.D).toString(16),
+          memory.reg8(reg8.E).toString(16),
+          memory.reg8(reg8.H).toString(16),
+          memory.reg8(reg8.L).toString(16),
+          memory.reg8(reg8.F).toString(16),
+          (memory.SP()>>8).toString(16),
+          (memory.SP()&0xFF).toString(16),
+          memory.readByte(0xFF80).toString(16))
+        pcRecord[pc] = 1
+      }
       memory.setPC(memory.PC() + 1)
       instr(memory)
     } else {
