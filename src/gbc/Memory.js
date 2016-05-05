@@ -68,8 +68,10 @@ const clockMapping = 0x1000D
 const gpuClockMapping = 0x10013
 const gpuModeMapping = 0x10017
 const gpuLineMapping = 0x10018
+const statMapping = 0xFF41
 const gpuScrollXMapping = 0x10019
 const gpuScrollYMapping = 0x10020
+const gpuLineCompareMapping = 0xFF45
 const gpuBGTileMapping = 0x10021
 const keyboardMapping = 0x10022
 const inputColumnMapping = 0x10024
@@ -208,6 +210,12 @@ function createMemory(canvas, buffer, tileset, screenBuffer){
     setLastInstructionClock(value){
       byteView[lastInstructionClockMapping] = value
     },
+    GPUStat(){
+      return byteView[statMapping]
+    },
+    setGPUStat(value){
+      byteView[statMapping] = value
+    },
     GPUMode(){
       return byteView[gpuModeMapping]
     },
@@ -231,6 +239,12 @@ function createMemory(canvas, buffer, tileset, screenBuffer){
     },
     setGPUScrollY(value){
       byteView[gpuScrollYMapping] = value
+    },
+    GPULineCompare(){
+      return byteView[gpuLineCompareMapping]
+    },
+    setGPULineCompare(value){
+      byteView[gpuLineCompareMapping] = value
     },
     GPUPallete(index){
       return [byteView[gpuPalleteMapping+(index*4)],

@@ -118,7 +118,6 @@ const onScanLine = (memory) =>{
 
 const onVBlank = (memory)=>{
   canvas.putImageData(memory.screenDataObj(), 0, 0)
-  memory.setInterruptFlags(0x01)
 }
 
 export default function GBCReducer(state = initialState, action) {

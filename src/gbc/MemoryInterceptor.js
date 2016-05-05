@@ -94,8 +94,10 @@ function createMemoryInterceptor(memory){
               (interceptedMemory.flag(flags.bgmap) ? 0x08 : 0x00) |
               (interceptedMemory.flag(flags.bgtile) ? 0x10 : 0x00) |
               (interceptedMemory.flag(flags.switchlcd) ? 0x80 : 0x00)
-        } else if(addr === 0xFF41) {
-            return 4
+        } else if(addr === 0xFF41){
+          let val = interceptedMemory.readByte(addr)
+          //console.log('reading 0xFF41', val)
+          return val
         } else if(addr === 0xFF42) {
           return interceptedMemory.GPUScrollY()
         } else if(addr === 0xFF43){
@@ -105,7 +107,7 @@ function createMemoryInterceptor(memory){
         } else if(addr < 0xFFFE && addr > 0xFF80){
           //stack
         } else {
-          console.log('unsupported read', addr.toString(16))
+          //console.log('unsupported read', addr.toString(16))
         }
       }
 
@@ -128,6 +130,10 @@ function createMemoryInterceptor(memory){
           interceptedMemory.setFlag(flags.bgmap, (value & 0x08) ? true : false)
           interceptedMemory.setFlag(flags.bgtile, (value & 0x10) ? true : false)
           interceptedMemory.setFlag(flags.switchlcd, (value & 0x80) ? true : false)
+        } else if(addr === 0xFF41){
+          //console.log('writing 0xFF41 with ',value)
+          interceptedMemory.writeByte(addr, value | 0b11111000)
+          return
         } else if(addr === 0xFF42){
           interceptedMemory.setGPUScrollY(value)
         } else if(addr === 0xFF43){
@@ -146,7 +152,7 @@ function createMemoryInterceptor(memory){
         } else if(addr < 0xFFFE && addr > 0xFF80){
           //stack
         } else {
-          console.log('unsuported write', addr.toString(16), ' ', value.toString(16))
+          //console.log('unsuported write', addr.toString(16), ' ', value.toString(16))
         }
       }
       interceptedMemory.writeByte(addr, value)
@@ -233,6 +239,12 @@ function createMemoryInterceptor(memory){
     setLastInstructionClock(value){
       interceptedMemory.setLastInstructionClock(value)
     },
+    GPUStat(){
+      return interceptedMemory.GPUStat()
+    },
+    setGPUStat(value){
+      interceptedMemory.setGPUStat(value)
+    },
     GPUMode(){
       return interceptedMemory.GPUMode()
     },
@@ -256,6 +268,12 @@ function createMemoryInterceptor(memory){
     },
     setGPUScrollY(value){
       interceptedMemory.setGPUScrollY(value)
+    },
+    GPULineCompare(){
+      return interceptedMemory.GPULineCompare()
+    },
+    setGPULineCompare(value){
+      interceptedMemory.setGPULineCompare(value)
     },
     GPUBGTile(){
       return interceptedMemory.GPUBGTile()

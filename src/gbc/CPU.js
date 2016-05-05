@@ -1,5 +1,18 @@
 import {default as Memory, reg8, flags} from './../../src/gbc/MemoryInterceptor'
 
+function checkLineCompare(memory){
+  if(memory.GPULine() === memory.GPULineCompare()){
+    if(memory.GPUStat() & 0b01000000){
+      memory.setInterruptFlags(memory.interruptFlags() | 1)
+    }
+    memory.setGPUStat(memory.GPUStat() & 0b11111111)
+  } else {
+    if(memory.GPUStat() & 0b01000000){
+      memory.setInterruptFlags(memory.interruptFlags() | 1)
+    }
+    memory.setGPUStat(memory.GPUStat() & 0b11111011)
+  }
+}
 
 export function stepGPU(opcodes, memory, onScanLine, onVBlank){
     memory.setGPUClock(memory.GPUClock() + memory.lastInstructionClock())
@@ -8,13 +21,18 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
         if(memory.GPUClock() >= 80){
           memory.setGPUClock(0)
 		      memory.setGPUMode(3)
-
+          memory.setGPUStat(memory.GPUStat() & 0b11111100)
+          memory.setGPUStat(memory.GPUStat() | 0b00000011)
         }
         break
       case 3:
         if(memory.GPUClock() >= 172){
           memory.setGPUClock(0)
 		      memory.setGPUMode(0)
+          if(memory.GPUStat() & 0b00001000){
+            memory.setInterruptFlags(memory.interruptFlags() | 1)
+          }
+          memory.setGPUStat(memory.GPUStat() & 0b11111100)
           onScanLine(memory)
           //renderscan
         }
@@ -23,11 +41,17 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
         if(memory.GPUClock() >= 204){
           memory.setGPUClock(0)
           memory.setGPULine(memory.GPULine() + 1)
-
+          checkLineCompare(memory)
           if(memory.GPULine() == 143){
               // Enter vblank
             memory.setGPUMode(1)
+            if(memory.GPUStat() & 0b00010000){
+              memory.setInterruptFlags(memory.interruptFlags() | 1)
+            }
+            memory.setGPUStat(memory.GPUStat() & 0b11111100)
+            memory.setGPUStat(memory.GPUStat() | 0b00000001)
             onVBlank(memory)
+            memory.setInterruptFlags(memory.interruptFlags() | 0)
             //GPU._canvas.putImageData(GPU._scrn, 0, 0);
           } else {
             memory.setGPUMode(2)
@@ -38,8 +62,14 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
         if(memory.GPUClock() >= 456){
           memory.setGPUClock(0)
           memory.setGPULine(memory.GPULine() + 1)
+          checkLineCompare(memory)
           if(memory.GPULine() > 153){
             memory.setGPUMode(2)
+            if(memory.GPUStat() & 0b00100000){
+              memory.setInterruptFlags(memory.interruptFlags() | 1)
+            }
+            memory.setGPUStat(memory.GPUStat() & 0b11111100)
+            memory.setGPUStat(memory.GPUStat() | 0b00000010)
             memory.setGPULine(0)
           }
         }
@@ -82,6 +112,8 @@ export function handleInterrupts(rst40, memory){
       let bit = (0x01 << i)
       if((ifired & bit) === 0)
         continue;
+
+      //console.log('interrupt',(0x40+i*8).toString(16),memory.GPUStat())
 
       memory.setFlag(flags.interruptMasterEnabled, false)
       memory.setInterruptFlags(memory.interruptFlags() & ~bit)
