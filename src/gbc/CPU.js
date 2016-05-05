@@ -1,15 +1,12 @@
 import {default as Memory, reg8, flags} from './../../src/gbc/MemoryInterceptor'
 
 function checkLineCompare(memory){
+  if(memory.GPUStat() & 0b01000000){
+    memory.setInterruptFlags(memory.interruptFlags() | 1)
+  }
   if(memory.GPULine() === memory.GPULineCompare()){
-    if(memory.GPUStat() & 0b01000000){
-      memory.setInterruptFlags(memory.interruptFlags() | 1)
-    }
-    memory.setGPUStat(memory.GPUStat() & 0b11111111)
+    memory.setGPUStat(memory.GPUStat() | 0b00000100)
   } else {
-    if(memory.GPUStat() & 0b01000000){
-      memory.setInterruptFlags(memory.interruptFlags() | 1)
-    }
     memory.setGPUStat(memory.GPUStat() & 0b11111011)
   }
 }
@@ -45,14 +42,13 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
           if(memory.GPULine() == 143){
               // Enter vblank
             memory.setGPUMode(1)
-            if(memory.GPUStat() & 0b00010000){
+            /*if(memory.GPUStat() & 0b00010000){
               memory.setInterruptFlags(memory.interruptFlags() | 1)
-            }
+            }*/
             memory.setGPUStat(memory.GPUStat() & 0b11111100)
             memory.setGPUStat(memory.GPUStat() | 0b00000001)
-            onVBlank(memory)
             memory.setInterruptFlags(memory.interruptFlags() | 0)
-            //GPU._canvas.putImageData(GPU._scrn, 0, 0);
+            onVBlank(memory)
           } else {
             memory.setGPUMode(2)
           }
