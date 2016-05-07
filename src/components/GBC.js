@@ -5,22 +5,20 @@ import {OperationCodesMapping as opcodes} from './../../src/gbc/OperationCodesMa
 
 let timerId = undefined
 
-const onLoadROMClicked = (dispatch, context, name) => {
-  return (event) => {
-    var oReq = new XMLHttpRequest();
-    oReq.open("GET", "/testrom?name="+name, true);
-    oReq.responseType = "arraybuffer";
+const onLoadROMClicked = (dispatch) => (event) => {
+  var oReq = new XMLHttpRequest();
+  oReq.open("GET", "/testrom?name="+event.target.value, true);
+  oReq.responseType = "arraybuffer";
 
-    oReq.onload = function (oEvent) {
-      var arrayBuffer = oReq.response; // Note: not oReq.responseText
-      if (arrayBuffer) {
-        var byteArray = new Uint8Array(arrayBuffer);
-        console.log('file loaded with size:',byteArray.byteLength)
-        dispatch(loadROM(byteArray))
-      }
-    };
-    oReq.send(null)
-  }
+  oReq.onload = function (oEvent) {
+    var arrayBuffer = oReq.response; // Note: not oReq.responseText
+    if (arrayBuffer) {
+      var byteArray = new Uint8Array(arrayBuffer);
+      console.log('file loaded with size:',byteArray.byteLength)
+      dispatch(loadROM(byteArray))
+    }
+  };
+  oReq.send(null)
 }
 
 const onNextCycleClicked = (dispatch, context) => {
@@ -130,37 +128,33 @@ export default {
         dispatch(keyUp(e.keyCode))
       }
     }
+    onLoadROMClicked(dispatch)({
+      target : {
+        value : 'tetris.gb'
+      }
+    })
   },
   render({dispatch, context}) {
     return (
       <div>
         <div class="form-group">
-          <button type="button" class="btn btn-default" onClick={onLoadROMClicked(dispatch, context, 'tetris.gb')} disabled={context.playing}>Load tetris</button>
-          <button type="button" class="btn btn-default" onClick={onLoadROMClicked(dispatch, context, 'opus5.gb')} disabled={context.playing}>Load test opus5 test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '01-special.gb')} disabled={context.playing}>Load test 01-special test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '01-read_timing.gb')} disabled={context.playing}>Load test 01-read_timing test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '02-interrupts.gb')} disabled={context.playing}>Load test 02-interrupts test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '02-write_timing.gb')} disabled={context.playing}>Load test 02-write_timing test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '03-modify_timing.gb')} disabled={context.playing}>Load test 03-modify_timing test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '03-op sp,hl.gb')} disabled={context.playing}>Load test 03-op sp,hl test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '04-op r,imm.gb')} disabled={context.playing}>Load test 04-op r,imm test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '05-op rp.gb')} disabled={context.playing}>Load test 05-op rp test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '06-ld r,r.gb')} disabled={context.playing}>Load test 06-ld r,r test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '07-jr,jp,call,ret,rst.gb')} disabled={context.playing}>Load test 07-jr,jp,call,ret,rst test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '08-misc instrs.gb')} disabled={context.playing}>Load test 08-misc instrs test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '09-op r,r.gb')} disabled={context.playing}>Load test 09-op r,r test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '10-bit ops.gb')} disabled={context.playing}>Load test 10-bit ops test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, '11-op a,(hl).gb')} disabled={context.playing}>Load test 11-op a,(hl) test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'adjtris.gb')} disabled={context.playing}>Load test adjtris test</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'ttt.gb')} disabled={context.playing}>Load test ttt</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'halt_bug.gb')} disabled={context.playing}>Load test halt_bug</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'instr_timing.gb')} disabled={context.playing}>Load test instr_timing</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'interrupt_time.gb')} disabled={context.playing}>Load test interrupt_time</button>
-          <button type="button" class="btn btn-default"  onClick={onLoadROMClicked(dispatch, context, 'mem_timing.gb')} disabled={context.playing}>Load test mem_timing</button>
-        </div>
-        <div class="form-group">
-          <button type="button" class="btn btn-default"  onClick={onsetPCClicked(dispatch, context, 0x00)} disabled={context.playing}>Set PC to 0x00</button>
-          <button type="button" class="btn btn-default"  onClick={onsetPCClicked(dispatch, context, 0x100)} disabled={context.playing}>Set PC to 0x100</button>
+          <select class="form-control" onChange={onLoadROMClicked(dispatch)} value="tetris.gb">
+            <option value="tetris.gb">tetris</option>
+            <option value="opus5.gb">topus5</option>
+            <option value="01-special.gb">01-special</option>
+            <option value="02-interrupts.gb">02-interrupts</option>
+            <option value="03-op sp,hl.gb">03-op sp,hl</option>
+            <option value="04-op r,imm.gb">04-op r,imm</option>
+            <option value="05-op rp.gb">05-op rp</option>
+            <option value="06-ld r,r.gb">06-ld r,r</option>
+            <option value="07-jr,jp,call,ret,rst.gb">07-jr,jp,call,ret,rst</option>
+            <option value="08-misc instrs.gb">08-misc instrs</option>
+            <option value="09-op r,r.gb">09-op r,r</option>
+            <option value="10-bit ops.gb">10-bit ops</option>
+            <option value="11-op a,(hl).gb">11-op a,(hl)</option>
+            <option value="adjtris.gb">adjtris</option>
+            <option value="ttt.gb">ttt</option>
+          </select>
         </div>
         <div class="form-group">
           <button type="button" class="btn btn-default"  onClick={onPrevCycleClicked(dispatch, context)} disabled={context.playing}>Prev Step</button>
@@ -211,6 +205,22 @@ export default {
             <tr>
               <td>H:0x{formatHex(context.currentMemory.reg8(reg8.H))}</td>
               <td>L:0x{formatHex(context.currentMemory.reg8(reg8.L))}</td>
+            </tr>
+            <tr>
+              <td>keySelect:{context.currentMemory.flag(flags.keySelect).toString()}</td>
+              <td>keyStart:{context.currentMemory.flag(flags.keyStart).toString()}</td>
+            </tr>
+            <tr>
+              <td>keyB:{context.currentMemory.flag(flags.keyB).toString()}</td>
+              <td>keyA:{context.currentMemory.flag(flags.keyA).toString()}</td>
+            </tr>
+            <tr>
+              <td>keyRight:{context.currentMemory.flag(flags.keyRight).toString()}</td>
+              <td>keyLeft:{context.currentMemory.flag(flags.keyLeft).toString()}</td>
+            </tr>
+            <tr>
+              <td>keyUp:{context.currentMemory.flag(flags.keyUp).toString()}</td>
+              <td>keyDown:{context.currentMemory.flag(flags.keyDown).toString()}</td>
             </tr>
           </table>
           <div>

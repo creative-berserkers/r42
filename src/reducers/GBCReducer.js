@@ -6,28 +6,43 @@ import {step} from '../gbc/CPU'
 
 let canvas = document.getElementById('display').getContext('2d')
 
-const initMemory = Memory.createEmptyMemoryFromCanvas(canvas)
+const createInitMemory = () => {
+  const initMemory = Memory.createEmptyMemoryFromCanvas(canvas)
 
-initMemory.setSP(0xFFFE)
-initMemory.setReg8(reg8.A, 0x01)
-initMemory.setReg8(reg8.B, 0x00)
-initMemory.setReg8(reg8.C, 0x13)
-initMemory.setReg8(reg8.D, 0x00)
-initMemory.setReg8(reg8.E, 0xD8)
-initMemory.setReg8(reg8.H, 0x01)
-initMemory.setReg8(reg8.L, 0x4D)
-initMemory.setReg8(reg8.F, 0xB0)
-initMemory.setPC(0x100)
-initMemory.setFlag(flags.interruptMasterEnabled, true)
-initMemory.setFlag(flags.halt, false)
+  initMemory.setSP(0xFFFE)
+  initMemory.setReg8(reg8.A, 0x01)
+  initMemory.setReg8(reg8.B, 0x00)
+  initMemory.setReg8(reg8.C, 0x13)
+  initMemory.setReg8(reg8.D, 0x00)
+  initMemory.setReg8(reg8.E, 0xD8)
+  initMemory.setReg8(reg8.H, 0x01)
+  initMemory.setReg8(reg8.L, 0x4D)
+  initMemory.setReg8(reg8.F, 0xB0)
+  initMemory.setPC(0x100)
+  initMemory.setFlag(flags.interruptMasterEnabled, true)
+  initMemory.setFlag(flags.halt, false)
+  initMemory.setInputState(0xFF)
+  return initMemory
+}
 const maxHistory = 200
 const initialState = {
     history: [],
-    currentMemory : initMemory,
+    currentMemory : createInitMemory(),
     showMemoryDump: false,
     playing: false,
     playingSpeed: 100,
     playingThreshold: 10000
+}
+
+const KeyMapping = {
+  39 : flags.keyRight,
+  37 : flags.keyLeft,
+  38 : flags.keyUp,
+  40 : flags.keyDown,
+  90 : flags.keyA,
+  88 : flags.keyB,
+  32 : flags.keySelect,
+  13 : flags.keyStart
 }
 
 const onScanLine = (memory) =>{
@@ -125,7 +140,7 @@ export default function GBCReducer(state = initialState, action) {
   let memory
   switch (action.type) {
     case LOAD_ROM:
-      memory = state.currentMemory.clone()
+      memory = createInitMemory()
       history = [...state.history, state.currentMemory]
       if(history.length>maxHistory){
         history = [...state.history.slice(1)]
@@ -181,7 +196,7 @@ export default function GBCReducer(state = initialState, action) {
       })
     case KEY_DOWN:
       memory = state.currentMemory.clone()
-      memory.setKeyState(action.key, true)
+      memory.setFlag(KeyMapping[action.key], false)
       history = [...state.history, state.currentMemory]
       if(history.length>maxHistory){
         history = [...state.history.slice(1)]
@@ -192,7 +207,7 @@ export default function GBCReducer(state = initialState, action) {
       })
     case KEY_UP:
       memory = state.currentMemory.clone()
-      memory.setKeyState(action.key, false)
+      memory.setFlag(KeyMapping[action.key], true)
       history = [...state.history, state.currentMemory]
       if(history.length>maxHistory){
         history = [...state.history.slice(1)]

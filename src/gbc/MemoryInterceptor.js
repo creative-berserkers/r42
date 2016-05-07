@@ -84,11 +84,7 @@ function createMemoryInterceptor(memory){
       if((addr & 0xFF00) === 0xFF00) {
         //io stuff
         if(addr === 0xFF00){ //keys
-          switch(interceptedMemory.inputColumn()){
-	           case 0x10: return interceptedMemory.keyState()[0]
-	           case 0x20: return interceptedMemory.keyState()[1]
-	           default: return 0;
-	        }
+          // input read, pass trough
         } else if(addr === 0xFF40){
             return (interceptedMemory.flag(flags.switchbg)? 0x01:0x00) |
               (interceptedMemory.flag(flags.bgmap) ? 0x08 : 0x00) |
@@ -124,7 +120,12 @@ function createMemoryInterceptor(memory){
         return
       } else if((addr & 0xFF00) === 0xFF00){
         if(addr === 0xFF00){//keys
-          interceptedMemory.setInputColumn(value & 0x30)
+          const inputColumn = value & 0x30;
+          if(inputColumn === 0x10){
+            interceptedMemory.writeByte(addr, (inputColumn | (memory.inputState() & 0b00001111)))
+          } else {
+            interceptedMemory.writeByte(addr, (inputColumn | (memory.inputState() >> 4)))
+          }
           return
         } else if(addr === 0xFF04){
           interceptedMemory.writeByte(addr, 0x00)
@@ -339,17 +340,11 @@ function createMemoryInterceptor(memory){
     loadROM(data){
       interceptedMemory.loadROM(data)
     },
-    inputColumn(){
-      return interceptedMemory.inputColumn()
+    inputState(){
+      return nterceptedMemory.inputState()
     },
-    setInputColumn(col){
-      interceptedMemory.setInputColumn(col)
-    },
-    keyState(){
-      return interceptedMemory.keyState()
-    },
-    setKeyState(keyCode, state){
-      interceptedMemory.setKeyState(keyCode, state)
+    setInputState(value){
+      interceptedMemory.setInputState(value)
     }
   }
 

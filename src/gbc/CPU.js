@@ -136,7 +136,7 @@ export function step(opcodes, rst40, memory, onScanLine, onVBlank){
       const addr = memory.readByte( pc )
       const instr = opcodes[addr]
 
-      if(pcRecord[pc] === 0){
+      /*if(pcRecord[pc] === 0){
         console.log(pc.toString(16),addr.toString(16),
           memory.reg8(reg8.A).toString(16),
           memory.reg8(reg8.B).toString(16),
@@ -150,7 +150,7 @@ export function step(opcodes, rst40, memory, onScanLine, onVBlank){
           (memory.SP()&0xFF).toString(16),
           memory.readByte(0xFF80).toString(16))
         pcRecord[pc] = 1
-      }
+      }*/
       memory.setPC(memory.PC() + 1)
       instr(memory)
     } else {
