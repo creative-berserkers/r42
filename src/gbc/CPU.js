@@ -9,11 +9,12 @@ export const JOYPAD_PRESS = 0x10
 const speed = [64, 1, 4 , 16]
 
 function checkLineCompare(memory){
-  if(memory.GPUStat() & 0b01000000){
-    memory.setInterruptFlags(memory.interruptFlags() | LCD_STATUS)
-  }
+
   if(memory.GPULine() === memory.GPULineCompare()){
     memory.setGPUStat(memory.GPUStat() | 0b00000100)
+    if(memory.GPUStat() & 0b01000000){
+      memory.setInterruptFlags(memory.interruptFlags() | LCD_STATUS)
+    }
   } else {
     memory.setGPUStat(memory.GPUStat() & 0b11111011)
   }
@@ -22,7 +23,7 @@ function checkLineCompare(memory){
 export function stepGPU(opcodes, memory, onScanLine, onVBlank){
     memory.setGPUClock(memory.GPUClock() + memory.lastInstructionClock())
     switch( memory.GPUMode() ){
-      case 2:
+      case 2: // OAM read mode, scanline active
         if(memory.GPUClock() >= 80){
           memory.setGPUClock(0)
 		      memory.setGPUMode(3)
@@ -30,7 +31,7 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
           memory.setGPUStat(memory.GPUStat() | 0b00000011)
         }
         break
-      case 3:
+      case 3: // VRAM read mode, scanline active
         if(memory.GPUClock() >= 172){
           memory.setGPUClock(0)
 		      memory.setGPUMode(0)
@@ -42,7 +43,7 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
           //renderscan
         }
         break
-      case 0:
+      case 0: // Hblank
         if(memory.GPUClock() >= 204){
           memory.setGPUClock(0)
           memory.setGPULine(memory.GPULine() + 1)
@@ -62,7 +63,7 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
           }
         }
         break
-      case 1:
+      case 1: //Vblank (10 lines)
         if(memory.GPUClock() >= 456){
           memory.setGPUClock(0)
           memory.setGPULine(memory.GPULine() + 1)
