@@ -111,9 +111,9 @@ export function handleInterrupts(rst40, memory){
 
       //console.log('interrupt',(0x40+i*8).toString(16),memory.GPUStat())
 
-      //memory.setFlag(flags.interruptMasterEnabled, false)
+      memory.setFlag(flags.interruptMasterEnabled, false)
       memory.setInterruptFlags(memory.interruptFlags() & ~bit)
-      //rst40(i*8, memory)
+      rst40(i*8, memory)
       break
     }
   }
