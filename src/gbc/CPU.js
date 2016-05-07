@@ -1,8 +1,16 @@
 import {default as Memory, reg8, flags} from './../../src/gbc/MemoryInterceptor'
 
+export const VERTICAL_BLANK	= 0x01
+export const LCD_STATUS = 0x02
+export const TIMER_OVERFLOW	= 0x04
+export const SERIAL_LINK = 0x08
+export const JOYPAD_PRESS = 0x10
+
+const speed = [64, 1, 4 , 16]
+
 function checkLineCompare(memory){
   if(memory.GPUStat() & 0b01000000){
-    memory.setInterruptFlags(memory.interruptFlags() | 1)
+    memory.setInterruptFlags(memory.interruptFlags() | LCD_STATUS)
   }
   if(memory.GPULine() === memory.GPULineCompare()){
     memory.setGPUStat(memory.GPUStat() | 0b00000100)
@@ -27,7 +35,7 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
           memory.setGPUClock(0)
 		      memory.setGPUMode(0)
           if(memory.GPUStat() & 0b00001000){
-            memory.setInterruptFlags(memory.interruptFlags() | 1)
+            memory.setInterruptFlags(memory.interruptFlags() | LCD_STATUS)
           }
           memory.setGPUStat(memory.GPUStat() & 0b11111100)
           onScanLine(memory)
@@ -47,7 +55,7 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
             }*/
             memory.setGPUStat(memory.GPUStat() & 0b11111100)
             memory.setGPUStat(memory.GPUStat() | 0b00000001)
-            memory.setInterruptFlags(memory.interruptFlags() | 0)
+            memory.setInterruptFlags(memory.interruptFlags() | VERTICAL_BLANK)
             onVBlank(memory)
           } else {
             memory.setGPUMode(2)
@@ -62,7 +70,7 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
           if(memory.GPULine() > 153){
             memory.setGPUMode(2)
             if(memory.GPUStat() & 0b00100000){
-              memory.setInterruptFlags(memory.interruptFlags() | 1)
+              memory.setInterruptFlags(memory.interruptFlags() | LCD_STATUS)
             }
             memory.setGPUStat(memory.GPUStat() & 0b11111100)
             memory.setGPUStat(memory.GPUStat() | 0b00000010)
@@ -89,7 +97,7 @@ export function stepTimer(memory){
       memory.setTimerTIMA(memory.timerTIMA() + 1)
       if(memory.timerTIMA() === 0){
         memory.setTimerTIMA(memory.timerTMA())
-        memory.setInterruptFlags(memory.interruptFlags() | 4)
+        memory.setInterruptFlags(memory.interruptFlags() | TIMER_OVERFLOW)
       }
     }
   }
@@ -124,11 +132,6 @@ const formatHex = (val) => {
   return ("0" + num).slice(-2)
 }
 
-const speed = [64, 1, 4 , 16]
-
-const pcRecord = new Array(0xFFFF)
-pcRecord.fill(0)
-
 export function step(opcodes, rst40, memory, onScanLine, onVBlank){
     if(!memory.flag(flags.halt)){
       const pc = memory.PC()
@@ -136,21 +139,6 @@ export function step(opcodes, rst40, memory, onScanLine, onVBlank){
       const addr = memory.readByte( pc )
       const instr = opcodes[addr]
 
-      /*if(pcRecord[pc] === 0){
-        console.log(pc.toString(16),addr.toString(16),
-          memory.reg8(reg8.A).toString(16),
-          memory.reg8(reg8.B).toString(16),
-          memory.reg8(reg8.C).toString(16),
-          memory.reg8(reg8.D).toString(16),
-          memory.reg8(reg8.E).toString(16),
-          memory.reg8(reg8.H).toString(16),
-          memory.reg8(reg8.L).toString(16),
-          memory.reg8(reg8.F).toString(16),
-          (memory.SP()>>8).toString(16),
-          (memory.SP()&0xFF).toString(16),
-          memory.readByte(0xFF80).toString(16))
-        pcRecord[pc] = 1
-      }*/
       memory.setPC(memory.PC() + 1)
       instr(memory)
     } else {

@@ -85,7 +85,6 @@ function createMemoryInterceptor(memory){
         //io stuff
         if(addr === 0xFF00){ //keys
           // input read, pass trough
-          console.log('input read', interceptedMemory.readByte(addr) )
         } else if(addr === 0xFF40){
             return (interceptedMemory.flag(flags.switchbg)? 0x01:0x00) |
               (interceptedMemory.flag(flags.bgmap) ? 0x08 : 0x00) |
@@ -122,12 +121,10 @@ function createMemoryInterceptor(memory){
       } else if((addr & 0xFF00) === 0xFF00){
         if(addr === 0xFF00){//keys
           const inputColumn = value & 0x30
-          if(inputColumn === 0x10){
+          if(inputColumn === 0x20){
             interceptedMemory.writeByte(addr, (inputColumn | (memory.inputState() & 0b00001111)))
-            console.log('input write 0x10', (inputColumn | (memory.inputState() & 0b00001111)).toString(2))
-          } else if(inputColumn === 0x20){
+          } else if(inputColumn === 0x10){
             interceptedMemory.writeByte(addr, (inputColumn | (memory.inputState() >> 4)))
-            console.log('input write 0x20', (inputColumn | (memory.inputState() >> 4)).toString(2))
           }
           return
         } else if(addr === 0xFF04){

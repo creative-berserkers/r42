@@ -2,7 +2,7 @@ import {STEP_FORWARD_CYCLE,STEP_BACKWARD_CYCLE, SHOW_MEMORY_DUMP, PLAY, STOP, CH
 import {default as Memory, reg8, flags} from '../gbc/MemoryInterceptor'
 import {RST_40} from '../gbc/OperationCodes'
 import {OperationCodesMapping as opcodes} from '../gbc/OperationCodesMapping'
-import {step} from '../gbc/CPU'
+import {step, JOYPAD_PRESS} from '../gbc/CPU'
 
 let canvas = document.getElementById('display').getContext('2d')
 
@@ -197,6 +197,7 @@ export default function GBCReducer(state = initialState, action) {
     case KEY_DOWN:
       memory = state.currentMemory.clone()
       memory.setFlag(KeyMapping[action.key], false)
+      memory.setInterruptFlags(memory.interruptFlags() | JOYPAD_PRESS)
       history = [...state.history, state.currentMemory]
       if(history.length>maxHistory){
         history = [...state.history.slice(1)]
@@ -208,6 +209,7 @@ export default function GBCReducer(state = initialState, action) {
     case KEY_UP:
       memory = state.currentMemory.clone()
       memory.setFlag(KeyMapping[action.key], true)
+      memory.setInterruptFlags(memory.interruptFlags() | JOYPAD_PRESS)
       history = [...state.history, state.currentMemory]
       if(history.length>maxHistory){
         history = [...state.history.slice(1)]
