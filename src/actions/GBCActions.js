@@ -20,6 +20,14 @@ export function showMemoryDump(flag){
   }
 }
 
+export const SHOW_OAM_DUMP = 'SHOW_OAM_DUMP'
+export function showOAMDump(flag){
+  return {
+    type : SHOW_OAM_DUMP,
+    flag: flag
+  }
+}
+
 export const PLAY = 'PLAY'
 export function play(speed){
   return {

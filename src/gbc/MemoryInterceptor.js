@@ -152,7 +152,11 @@ function createMemoryInterceptor(memory){
           interceptedMemory.setGPUScrollX(value)
           return
         } else if(addr === 0xFF46){
-          //console.log('writing ', addr, value)
+          let source;
+          for(let i=0;i<0x9F;++i){
+            source = (value << 8) + i
+            interceptedMemory.writeByte(0xFE00 + i, interceptedMemory.readByte(source))
+          }
         } else if(addr === 0xFF47){
           for(let i=0; i < 4; ++i){
             switch((value >> (i * 2)) & 3){
@@ -176,7 +180,19 @@ function createMemoryInterceptor(memory){
     },
     writeWord(addr, value){
       interceptor.writeByte(addr, value)
-      interceptor.writeByte(addr+1, value)
+      interceptor.writeByte(addr+1, value>>8)
+    },
+    readInt(addr){
+      return ((interceptor.readByte(addr))+
+        (interceptor.readByte(addr+1)*256)+
+        (interceptor.readByte(addr+2)*65536)+
+        (interceptor.readByte(addr+3)*16777216))
+    },
+    writeInt(addr, value){
+      interceptor.writeByte(addr, value)
+      interceptor.writeByte(addr+1, value>>8)
+      interceptor.writeByte(addr+2, value>>16)
+      interceptor.writeByte(addr+3, value>>24)
     },
     reg8(addr){
       return interceptedMemory.reg8(addr)

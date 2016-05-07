@@ -1,5 +1,5 @@
 import {element} from 'deku'
-import {stepForwardCycle, stepBackwardCycle, showMemoryDump, play, stop, changeSpeed, changeThreshold, loadROM, setPC, keyUp, keyDown} from '../actions/GBCActions'
+import {stepForwardCycle, stepBackwardCycle, showMemoryDump,showOAMDump, play, stop, changeSpeed, changeThreshold, loadROM, setPC, keyUp, keyDown} from '../actions/GBCActions'
 import {default as Memory, reg8, flags} from '../gbc/MemoryInterceptor'
 import {OperationCodesMapping as opcodes} from './../../src/gbc/OperationCodesMapping'
 
@@ -38,6 +38,13 @@ const onShowMemoryDumpClicked = (dispatch, context) => {
     dispatch(showMemoryDump(!context.showMemoryDump))
   }
 }
+
+const onShowOAMDumpClicked = (dispatch, context) => {
+  return (event) => {
+    dispatch(showOAMDump(!context.showOAMDump))
+  }
+}
+
 
 const handleSpeedChange = (dispatch, context) => {
   return (event) => {
@@ -106,6 +113,29 @@ const printMemory = (memory) => {
     } else {
       rows.push(formatHex(memory.readByte(i)))
     }
+  }
+  return rows
+}
+
+const decodeOAM = (oam) => {
+  const y = (oam & 0xFF)
+  const x = ((oam>>8)&0xFF)
+  const tile = ((oam>>16)&0xFF)
+  const options = ((oam>>24)&0xFF)
+
+  const spritePosition = ((options & 0x40) === 0) ? 'above bg' : 'below bg'
+  const yFlip = ((options&0x20) !== 0)
+  const xFlip = ((options&0x20) !== 0)
+  const pallete = ((options&0x20) === 0) ? 0 : 1
+
+  return `x:${x} y:+${y} tile:${tile} pos:${spritePosition} yFlip:${yFlip} xFlip:${xFlip} pallete:${pallete}`
+}
+
+const printOAM = (memory) => {
+  let rows = ""
+  for(let i=0; i<40;++i){
+    let oam = memory.readInt(0xFE00 + (i*4))
+    rows += ("<p>"+decodeOAM(oam)+"</p>")
   }
   return rows
 }
@@ -223,6 +253,10 @@ export default {
               <td>keyDown:{context.currentMemory.flag(flags.keyDown).toString()}</td>
             </tr>
           </table>
+          <div>
+            <button type="button" class="btn btn-default"  onClick={onShowOAMDumpClicked(dispatch, context)} disabled={context.playing}>Show OAM dump {context.showOAMDump === true? 'ON' : 'OFF'}</button>
+            {(context.showOAMDump === true) ? <div class="memoryblock" innerHTML={(context.showOAMDump === true) ? printOAM(context.currentMemory) : ''}></div>:null}
+          </div>
           <div>
             <button type="button" class="btn btn-default"  onClick={onShowMemoryDumpClicked(dispatch, context)} disabled={context.playing}>Show memory dump {context.showMemoryDump === true? 'ON' : 'OFF'}</button>
             {(context.showMemoryDump === true) ? <div class="memoryblock" innerHTML={(context.showMemoryDump === true) ? printMemory(context.currentMemory) : ''}></div>:null}

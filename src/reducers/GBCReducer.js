@@ -1,4 +1,4 @@
-import {STEP_FORWARD_CYCLE,STEP_BACKWARD_CYCLE, SHOW_MEMORY_DUMP, PLAY, STOP, CHANGE_SPEED, CHANGE_THRESHOLD, LOAD_ROM, SET_PC, KEY_UP, KEY_DOWN} from '../actions/GBCActions'
+import {STEP_FORWARD_CYCLE,STEP_BACKWARD_CYCLE, SHOW_MEMORY_DUMP,SHOW_OAM_DUMP, PLAY, STOP, CHANGE_SPEED, CHANGE_THRESHOLD, LOAD_ROM, SET_PC, KEY_UP, KEY_DOWN} from '../actions/GBCActions'
 import {default as Memory, reg8, flags} from '../gbc/MemoryInterceptor'
 import {RST_40} from '../gbc/OperationCodes'
 import {OperationCodesMapping as opcodes} from '../gbc/OperationCodesMapping'
@@ -29,6 +29,7 @@ const initialState = {
     history: [],
     currentMemory : createInitMemory(),
     showMemoryDump: false,
+    showOAMDump: false,
     playing: false,
     playingSpeed: 100,
     playingThreshold: 10000
@@ -94,41 +95,31 @@ const onScanLine = (memory) =>{
     }
   }
 
-  /*if(memory.flag(flags.switchlcd)){
-    let scanRow = []
-    for(let i=0; i<160; i++) scanRow[i] = 0;
-    if(memory.flag(flags.switchbg)){
-      var linebase = line * 640;
-      var mapbase = memory.flag(flags.bgmap) + ((((line+scrollY)&255)>>3)<<5);
-      var y = (line+scrollY)&7;
-      var x = scrollX&7;
-      var t = (scrollX>>3)&31;
-      var pixel;
-      var w=160;
+  for(let i=0;i<40;++i){
+    let oam = memory.readInt(0xFE00 + (i*4))
+    const spriteY = ((oam & 0xFF) - 16)
 
-      if(memory.flag(flags.bgtile)){
-        var tile = memory.readByte(mapbase+t)
-        if(tile<128) tile=256+tile;
-        var tilerow = memory.tilesetDataRow(tile,y);
-        do {
-          scanRow[160-x] = tilerow[x];
-          memory.setScreenData(linebase+3, memory.GPUPallete(tilerow[x]))
-          x++;
-          if(x==8) { t=(t+1)&31; x=0; tile=memory.readByte(mapbase+t); if(tile<128) tile=256+tile; tilerow = memory.tilesetDataRow(tile,y); }
-          linebase+=4;
-        } while(--w);
-      } else {
-        var tilerow=memory.tilesetDataRow(memory.readByte(mapbase+t),y)
-        do {
-          scanRow[160-x] = tilerow[x];
-          memory.setScreenData(linebase+3 , memory.GPUPallete(tilerow[x]))
-          x++;
-          if(x==8) { t=(t+1)&31; x=0; tilerow=memory.tilesetDataRow(memory.readByte(mapbase+t),y); }
-          linebase+=4;
-        } while(--w);
+    if(spriteY <= memory.GPULine() && (spriteY+8)>memory.GPULine()){
+      const spriteX = ((oam>>8)&0xFF)-8
+      const tile = ((oam>>16)&0xFF)
+      const options = ((oam>>24)&0xFF)
+      const spritePosition = ((options & 0x40) === 0) ? 0 : 1
+      const yFlip = ((options&0x20) !== 0)
+      const xFlip = ((options&0x20) !== 0)
+      const pallete = ((options&0x20) === 0) ? 0 : 1
+
+      let canvasOffset = (memory.GPULine() * 160 + spriteX) * 4
+      for(let x = 0; x < 8; ++x){
+        if((spriteX+x >= 0) && (spriteX+x <160)){
+          memory.setScreenData(canvasOffset+0, 128)
+			    memory.setScreenData(canvasOffset+1, 128)
+			    memory.setScreenData(canvasOffset+2, 128)
+			    memory.setScreenData(canvasOffset+3, 255)
+        }
+        canvasOffset += 4
       }
     }
-  }*/
+  }
 }
 
 const onVBlank = (memory)=>{
@@ -175,6 +166,8 @@ export default function GBCReducer(state = initialState, action) {
       }
     case SHOW_MEMORY_DUMP:
       return Object.assign({}, state, { showMemoryDump: action.flag})
+    case SHOW_OAM_DUMP:
+      return Object.assign({}, state, { showOAMDump: action.flag})
     case PLAY:
       return Object.assign({}, state, { playing: true})
     case STOP:
