@@ -167,6 +167,26 @@ function createMemoryInterceptor(memory){
             }
           }
           return
+        } else if(addr === 0xFF48){
+          for(let i=0; i < 4; ++i){
+            switch((value >> (i * 2)) & 3){
+              case 0 : interceptedMemory.setGPUObj1Pallete(i, [255,255,255,255]); break
+              case 1 : interceptedMemory.setGPUObj1Pallete(i, [192,192,192,255]); break
+              case 2 : interceptedMemory.setGPUObj1Pallete(i, [96, 96, 96, 255]); break
+              case 3 : interceptedMemory.setGPUObj1Pallete(i, [0, 0, 0, 255]); break
+            }
+          }
+          return
+        } else if(addr === 0xFF49){
+          for(let i=0; i < 4; ++i){
+            switch((value >> (i * 2)) & 3){
+              case 0 : interceptedMemory.setGPUObj2Pallete(i, [255,255,255,255]); break
+              case 1 : interceptedMemory.setGPUObj2Pallete(i, [192,192,192,255]); break
+              case 2 : interceptedMemory.setGPUObj2Pallete(i, [96, 96, 96, 255]); break
+              case 3 : interceptedMemory.setGPUObj2Pallete(i, [0, 0, 0, 255]); break
+            }
+          }
+          return
         } else if(addr < 0xFFFE && addr > 0xFF80){
           //stack
         } else {
@@ -313,6 +333,18 @@ function createMemoryInterceptor(memory){
     },
     setGPUPallete(index, value){
       interceptedMemory.setGPUPallete(index, value)
+    },
+    GPUObj1Pallete(index){
+      return interceptedMemory.GPUObj1Pallete(index)
+    },
+    setGPUObj1Pallete(index, value){
+      interceptedMemory.setGPUObj1Pallete(index, value)
+    },
+    GPUObj2Pallete(index){
+      return interceptedMemory.GPUObj2Pallete(index)
+    },
+    setGPUObj2Pallete(index, value){
+      interceptedMemory.setGPUObj2Pallete(index, value)
     },
     setGPUBGTile(value){
       interceptedMemory.setGPUBGTile(value)

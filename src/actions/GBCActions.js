@@ -60,6 +60,14 @@ export function changeThreshold(threshold){
   }
 }
 
+export const SHOW_ADVANCED_OPTIONS = 'SHOW_ADVANCED_OPTIONS'
+export function showAdvancedOptions(flag){
+  return {
+    type: SHOW_ADVANCED_OPTIONS,
+    flag: flag
+  }
+}
+
 export const LOAD_ROM = 'LOAD_ROM'
 export function loadROM(data){
   return {

@@ -1,5 +1,5 @@
 import {element} from 'deku'
-import {stepForwardCycle, stepBackwardCycle, showMemoryDump,showOAMDump, play, stop, changeSpeed, changeThreshold, loadROM, setPC, keyUp, keyDown} from '../actions/GBCActions'
+import {stepForwardCycle, stepBackwardCycle, showMemoryDump,showOAMDump,showAdvancedOptions, play, stop, changeSpeed, changeThreshold, loadROM, setPC, keyUp, keyDown} from '../actions/GBCActions'
 import {default as Memory, reg8, flags} from '../gbc/MemoryInterceptor'
 import {OperationCodesMapping as opcodes} from './../../src/gbc/OperationCodesMapping'
 
@@ -100,6 +100,12 @@ const onsetPCClicked = (dispatch, context, pc)=>{
   }
 }
 
+const onShowAdvancedOptionsClicked = (dispatch, context)=>{
+  return (event) => {
+    dispatch(showAdvancedOptions(!context.showAdvancedOptions))
+  }
+}
+
 const formatHex = (val) => {
   let num = val.toString(16).toUpperCase()
   return ("0" + num).slice(-2)
@@ -187,81 +193,86 @@ export default {
           </select>
         </div>
         <div class="form-group">
-          <button type="button" class="btn btn-default"  onClick={onPrevCycleClicked(dispatch, context)} disabled={context.playing}>Prev Step</button>
-          <button type="button" class="btn btn-default"  onClick={onNextCycleClicked(dispatch, context)} disabled={context.playing}>Next Step</button>
-        </div>
-        <div class="form-inline">
-          <div class="form-group">
-            Speed: <input type='text' class="form-control" onChange={handleSpeedChange(dispatch, context)} size='4' value={context.playingSpeed} disabled={context.playing}></input>
-          </div>
-          <div class="form-group">
-            Threshold: <input type='text' class="form-control" onChange={handleThresholdChange(dispatch, context)} size='4' value={context.playingThreshold} disabled={context.playing}></input>
-          </div>
-        </div>
-        <div class="form-group">
           <button type="button" class="btn btn-default"  onClick={onPlayClicked(dispatch, context)}>Play</button>
           <button type="button" class="btn btn-default"  onClick={onStopClicked(dispatch, context)}>Stop</button>
         </div>
-        <div class="form-group">
-          <table>
-            <tr>
-              <td>Clock:{context.currentMemory.clock()}</td>
-              <td>last instr took:{context.currentMemory.lastInstructionClock()}</td>
-            </tr>
-            <tr>
-              <td>GPU Clock:{context.currentMemory.GPUClock()}</td>
-              <td>next instr:{opcodes[context.currentMemory.readByte(context.currentMemory.PC())].name}</td>
-            </tr>
-            <tr>
-              <td>GPU Line:{context.currentMemory.GPULine()}</td>
-              <td>GPU Mode:{context.currentMemory.GPUMode()}</td>
-            </tr>
-            <tr>
-              <td>PC:0x{formatHex(context.currentMemory.PC())}</td>
-              <td>SP:0x{formatHex(context.currentMemory.SP())}</td>
-            </tr>
-            <tr>
-              <td>A:0x{formatHex(context.currentMemory.reg8(reg8.A))}</td>
-              <td>F:0x{formatHex(context.currentMemory.reg8(reg8.F))}</td>
-            </tr>
-            <tr>
-              <td>B:0x{formatHex(context.currentMemory.reg8(reg8.B))}</td>
-              <td>C:0x{formatHex(context.currentMemory.reg8(reg8.C))}</td>
-            </tr>
-            <tr>
-              <td>D:0x{formatHex(context.currentMemory.reg8(reg8.D))}</td>
-              <td>E:0x{formatHex(context.currentMemory.reg8(reg8.E))}</td>
-            </tr>
-            <tr>
-              <td>H:0x{formatHex(context.currentMemory.reg8(reg8.H))}</td>
-              <td>L:0x{formatHex(context.currentMemory.reg8(reg8.L))}</td>
-            </tr>
-            <tr>
-              <td>keySelect:{context.currentMemory.flag(flags.keySelect).toString()}</td>
-              <td>keyStart:{context.currentMemory.flag(flags.keyStart).toString()}</td>
-            </tr>
-            <tr>
-              <td>keyB:{context.currentMemory.flag(flags.keyB).toString()}</td>
-              <td>keyA:{context.currentMemory.flag(flags.keyA).toString()}</td>
-            </tr>
-            <tr>
-              <td>keyRight:{context.currentMemory.flag(flags.keyRight).toString()}</td>
-              <td>keyLeft:{context.currentMemory.flag(flags.keyLeft).toString()}</td>
-            </tr>
-            <tr>
-              <td>keyUp:{context.currentMemory.flag(flags.keyUp).toString()}</td>
-              <td>keyDown:{context.currentMemory.flag(flags.keyDown).toString()}</td>
-            </tr>
-          </table>
-          <div>
-            <button type="button" class="btn btn-default"  onClick={onShowOAMDumpClicked(dispatch, context)} disabled={context.playing}>Show OAM dump {context.showOAMDump === true? 'ON' : 'OFF'}</button>
-            {(context.showOAMDump === true) ? <div class="memoryblock" innerHTML={(context.showOAMDump === true) ? printOAM(context.currentMemory) : ''}></div>:null}
+        <button type="button" class="btn btn-default"  onClick={onShowAdvancedOptionsClicked(dispatch, context)}>Show Advanced Options: {context.showAdvancedOptions === true? 'ON' : 'OFF'}</button>
+        { (context.showAdvancedOptions === true) ?
+        <div>
+          <div class="form-group">
+            <button type="button" class="btn btn-default"  onClick={onPrevCycleClicked(dispatch, context)} disabled={context.playing}>Prev Step</button>
+            <button type="button" class="btn btn-default"  onClick={onNextCycleClicked(dispatch, context)} disabled={context.playing}>Next Step</button>
           </div>
-          <div>
-            <button type="button" class="btn btn-default"  onClick={onShowMemoryDumpClicked(dispatch, context)} disabled={context.playing}>Show memory dump {context.showMemoryDump === true? 'ON' : 'OFF'}</button>
-            {(context.showMemoryDump === true) ? <div class="memoryblock" innerHTML={(context.showMemoryDump === true) ? printMemory(context.currentMemory) : ''}></div>:null}
+          <div class="form-inline">
+            <div class="form-group">
+              Speed: <input type='text' class="form-control" onChange={handleSpeedChange(dispatch, context)} size='4' value={context.playingSpeed} disabled={context.playing}></input>
+            </div>
+            <div class="form-group">
+              Threshold: <input type='text' class="form-control" onChange={handleThresholdChange(dispatch, context)} size='4' value={context.playingThreshold} disabled={context.playing}></input>
+            </div>
+          </div>
+          <div class="form-group">
+            <table>
+              <tr>
+                <td>Clock:{context.currentMemory.clock()}</td>
+                <td>last instr took:{context.currentMemory.lastInstructionClock()}</td>
+              </tr>
+              <tr>
+                <td>GPU Clock:{context.currentMemory.GPUClock()}</td>
+                <td>next instr:{opcodes[context.currentMemory.readByte(context.currentMemory.PC())].name}</td>
+              </tr>
+              <tr>
+                <td>GPU Line:{context.currentMemory.GPULine()}</td>
+                <td>GPU Mode:{context.currentMemory.GPUMode()}</td>
+              </tr>
+              <tr>
+                <td>PC:0x{formatHex(context.currentMemory.PC())}</td>
+                <td>SP:0x{formatHex(context.currentMemory.SP())}</td>
+              </tr>
+              <tr>
+                <td>A:0x{formatHex(context.currentMemory.reg8(reg8.A))}</td>
+                <td>F:0x{formatHex(context.currentMemory.reg8(reg8.F))}</td>
+              </tr>
+              <tr>
+                <td>B:0x{formatHex(context.currentMemory.reg8(reg8.B))}</td>
+                <td>C:0x{formatHex(context.currentMemory.reg8(reg8.C))}</td>
+              </tr>
+              <tr>
+                <td>D:0x{formatHex(context.currentMemory.reg8(reg8.D))}</td>
+                <td>E:0x{formatHex(context.currentMemory.reg8(reg8.E))}</td>
+              </tr>
+              <tr>
+                <td>H:0x{formatHex(context.currentMemory.reg8(reg8.H))}</td>
+                <td>L:0x{formatHex(context.currentMemory.reg8(reg8.L))}</td>
+              </tr>
+              <tr>
+                <td>keySelect:{context.currentMemory.flag(flags.keySelect).toString()}</td>
+                <td>keyStart:{context.currentMemory.flag(flags.keyStart).toString()}</td>
+              </tr>
+              <tr>
+                <td>keyB:{context.currentMemory.flag(flags.keyB).toString()}</td>
+                <td>keyA:{context.currentMemory.flag(flags.keyA).toString()}</td>
+              </tr>
+              <tr>
+                <td>keyRight:{context.currentMemory.flag(flags.keyRight).toString()}</td>
+                <td>keyLeft:{context.currentMemory.flag(flags.keyLeft).toString()}</td>
+              </tr>
+              <tr>
+                <td>keyUp:{context.currentMemory.flag(flags.keyUp).toString()}</td>
+                <td>keyDown:{context.currentMemory.flag(flags.keyDown).toString()}</td>
+              </tr>
+            </table>
+            <div>
+              <button type="button" class="btn btn-default"  onClick={onShowOAMDumpClicked(dispatch, context)} disabled={context.playing}>Show OAM dump {context.showOAMDump === true? 'ON' : 'OFF'}</button>
+              {(context.showOAMDump === true) ? <div class="memoryblock" innerHTML={(context.showOAMDump === true) ? printOAM(context.currentMemory) : ''}></div>:null}
+            </div>
+            <div>
+              <button type="button" class="btn btn-default"  onClick={onShowMemoryDumpClicked(dispatch, context)} disabled={context.playing}>Show memory dump {context.showMemoryDump === true? 'ON' : 'OFF'}</button>
+              {(context.showMemoryDump === true) ? <div class="memoryblock" innerHTML={(context.showMemoryDump === true) ? printMemory(context.currentMemory) : ''}></div>:null}
+            </div>
           </div>
         </div>
+        : null }
       </div>
     )
   }

@@ -1,4 +1,4 @@
-import {STEP_FORWARD_CYCLE,STEP_BACKWARD_CYCLE, SHOW_MEMORY_DUMP,SHOW_OAM_DUMP, PLAY, STOP, CHANGE_SPEED, CHANGE_THRESHOLD, LOAD_ROM, SET_PC, KEY_UP, KEY_DOWN} from '../actions/GBCActions'
+import {STEP_FORWARD_CYCLE,STEP_BACKWARD_CYCLE, SHOW_MEMORY_DUMP,SHOW_OAM_DUMP,SHOW_ADVANCED_OPTIONS, PLAY, STOP, CHANGE_SPEED, CHANGE_THRESHOLD, LOAD_ROM, SET_PC, KEY_UP, KEY_DOWN} from '../actions/GBCActions'
 import {default as Memory, reg8, flags} from '../gbc/MemoryInterceptor'
 import {RST_40} from '../gbc/OperationCodes'
 import {OperationCodesMapping as opcodes} from '../gbc/OperationCodesMapping'
@@ -30,6 +30,7 @@ const initialState = {
     currentMemory : createInitMemory(),
     showMemoryDump: false,
     showOAMDump: false,
+    showAdvancedOptions: false,
     playing: false,
     playingSpeed: 100,
     playingThreshold: 10000
@@ -108,13 +109,18 @@ const onScanLine = (memory) =>{
       const xFlip = ((options&0x20) !== 0)
       const pallete = ((options&0x20) === 0) ? 0 : 1
 
+      const palleteData = pallete ? memory.GPUObj1Pallete : memory.GPUObj2Pallete
+
+      const tilerow = memory.tilesetDataRow(tile, (memory.GPULine() - spriteY))
+
       let canvasOffset = (memory.GPULine() * 160 + spriteX) * 4
       for(let x = 0; x < 8; ++x){
-        if((spriteX+x >= 0) && (spriteX+x <160)){
-          memory.setScreenData(canvasOffset+0, 128)
-			    memory.setScreenData(canvasOffset+1, 128)
-			    memory.setScreenData(canvasOffset+2, 128)
-			    memory.setScreenData(canvasOffset+3, 255)
+        if((spriteX+x >= 0) && (spriteX+x <160) && tilerow[x]){
+          const color = palleteData(tilerow[x])
+          memory.setScreenData(canvasOffset+0, color[0])
+			    memory.setScreenData(canvasOffset+1, color[1])
+			    memory.setScreenData(canvasOffset+2, color[2])
+			    memory.setScreenData(canvasOffset+3, color[3])
         }
         canvasOffset += 4
       }
@@ -166,6 +172,8 @@ export default function GBCReducer(state = initialState, action) {
       }
     case SHOW_MEMORY_DUMP:
       return Object.assign({}, state, { showMemoryDump: action.flag})
+    case SHOW_ADVANCED_OPTIONS:
+      return Object.assign({}, state, { showAdvancedOptions: action.flag})
     case SHOW_OAM_DUMP:
       return Object.assign({}, state, { showOAMDump: action.flag})
     case PLAY:

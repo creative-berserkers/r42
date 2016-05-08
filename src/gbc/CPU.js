@@ -83,7 +83,7 @@ export function stepGPU(opcodes, memory, onScanLine, onVBlank){
 }
 
 export function stepTimer(memory){
-  memory.setTimerDIVStep(memory.timerDIVStep() + memory.lastInstructionClock())
+  memory.setTimerDIVStep(memory.timerDIVStep() + (memory.lastInstructionClock()*4))
   if(memory.timerDIVStep() >= 64){
     memory.setTimerDIVStep(memory.timerDIVStep() - 64)
     memory.setTimerDIV(memory.timerDIV() + 1)
@@ -91,7 +91,7 @@ export function stepTimer(memory){
 
 
   if(memory.timerTAC() & 4){
-    memory.setTimerTIMAStep(memory.timerTIMAStep() + memory.lastInstructionClock())
+    memory.setTimerTIMAStep(memory.timerTIMAStep() + (memory.lastInstructionClock()*4))
     const threshold = speed[memory.timerTAC() & 3]
     if(memory.timerTIMAStep() >= threshold){
       memory.setTimerTIMAStep(memory.timerTIMAStep() - threshold)

@@ -23,7 +23,7 @@ clock : 1800D to 18010
 stop flag: 18011
  */
 
-const expectedBufferSize = 0x10046
+const expectedBufferSize = 0x10060
 const tilesetBufferSize = 0x8000
 const screenBufferSize = 0x16800
 
@@ -91,6 +91,8 @@ const timerTIMAStepMapping = 0x10026
 const inputStateMapping = 0x10027
 
 const gpuPalleteMapping = 0x10030
+const gpuObj1PalleteMapping = 0x10040
+const gpuObj2PalleteMapping = 0x10050
 
 const interruptFlagsMapping = 0xFF0F
 const interruptEnabledMapping = 0xFFFF
@@ -268,6 +270,30 @@ function createMemory(canvas, buffer, tileset, screenBuffer){
       byteView[gpuPalleteMapping+(index*4)+1] = value[1]
       byteView[gpuPalleteMapping+(index*4)+2] = value[2]
       byteView[gpuPalleteMapping+(index*4)+3] = value[3]
+    },
+    GPUObj1Pallete(index){
+      return [byteView[gpuObj1PalleteMapping+(index*4)],
+              byteView[gpuObj1PalleteMapping+(index*4)+1],
+              byteView[gpuObj1PalleteMapping+(index*4)+2],
+              byteView[gpuObj1PalleteMapping+(index*4)+3]]
+    },
+    setGPUObj1Pallete(index, value){
+      byteView[gpuObj1PalleteMapping+(index*4)] = value[0]
+      byteView[gpuObj1PalleteMapping+(index*4)+1] = value[1]
+      byteView[gpuObj1PalleteMapping+(index*4)+2] = value[2]
+      byteView[gpuObj1PalleteMapping+(index*4)+3] = value[3]
+    },
+    GPUObj2Pallete(index){
+      return [byteView[gpuObj2PalleteMapping+(index*4)],
+              byteView[gpuObj2PalleteMapping+(index*4)+1],
+              byteView[gpuObj2PalleteMapping+(index*4)+2],
+              byteView[gpuObj2PalleteMapping+(index*4)+3]]
+    },
+    setGPUObj2Pallete(index, value){
+      byteView[gpuObj2PalleteMapping+(index*4)] = value[0]
+      byteView[gpuObj2PalleteMapping+(index*4)+1] = value[1]
+      byteView[gpuObj2PalleteMapping+(index*4)+2] = value[2]
+      byteView[gpuObj2PalleteMapping+(index*4)+3] = value[3]
     },
     interruptFlags(){
       return byteView[interruptFlagsMapping]
