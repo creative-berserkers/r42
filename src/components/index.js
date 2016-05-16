@@ -7,6 +7,12 @@ const GameReducer = require('../reducers/GameReducer')
 const store = createStore(GameReducer)
 const render = createApp(document.getElementById('mount'), store.dispatch)
 
+const socket = new WebSocket(`ws://${location.host}/severEndpoint`)
+
+socket.onmessage = (event)=>{
+  console.log(event)
+}
+
 // Rendering function
 function update (Component) {
     render(<Component />, store.getState())

@@ -1,10 +1,13 @@
 
 var webpack = require('webpack'),
-    config = require('./webpack.config.dev'),
-    dev = require('webpack-dev-middleware'),
-    hot = require('webpack-hot-middleware'),
-    express = require('express'),
-    path = require('path')
+  WebSocketServer = require('ws').Server
+  config = require('./webpack.config.dev'),
+  dev = require('webpack-dev-middleware'),
+  hot = require('webpack-hot-middleware'),
+  express = require('express'),
+  path = require('path'),
+  http = require('http')
+
 
 var compiler = webpack(config)
 
@@ -22,8 +25,16 @@ app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, 'index.html'));
 })
 
+var server = http.createServer(app)
+
+var wss = new WebSocketServer({server: server, path: "/severEndpoint"})
+
+wss.on('connection', function(ws){
+   console.log('incomming connection')
+});
+
 console.log('Compiling...')
-app.listen(3000, 'localhost', function(err) {
+server.listen(3000, 'localhost', function(err) {
   if (err) console.log(err)
-  else console.log('Listening at http://localhost:3000');
+  else console.log('Listening at http://localhost:3000')
 })
