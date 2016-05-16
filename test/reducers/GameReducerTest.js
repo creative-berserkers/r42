@@ -12,7 +12,7 @@ const {
 chai.use(chaiImmutable);
 const {expect} = chai
 
-describe('GameReducer', () => {
+describe('GameReducer', () => { //testing 
   it('should return the initial state', () => {
     expect(
       GameReducer(undefined, {})
