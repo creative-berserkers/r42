@@ -10,7 +10,9 @@ const render = createApp(document.getElementById('mount'), store.dispatch)
 const socket = new WebSocket(`ws://${location.host}/severEndpoint`)
 
 socket.onmessage = (event)=>{
-  console.log(event)
+  //console.log(event)
+  store.dispatch(JSON.parse(event.data))
+  console.log(store.getState().toJS())
 }
 
 // Rendering function

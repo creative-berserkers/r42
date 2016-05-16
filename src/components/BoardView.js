@@ -5,12 +5,11 @@ const CellView = require('./CellView')
 const GRID_SIZE = 40
 
 module.exports = {
-  render({props}) {
+  render({props, context}) {
     const intersections = []
-    for (var i = 0; i < props.board.size; i++)
-        for (var j = 0; j < props.board.size; j++)
+    for (var i = 0; i < props.size.height; i++)
+        for (var j = 0; j < props.size.width; j++)
             intersections.push(<CellView
-                board={props.board}
                 gridSize={GRID_SIZE}
                 row={i}
                 col={j}
@@ -18,8 +17,8 @@ module.exports = {
               </CellView>
             )
     const style = `
-        width: ${props.board.size * GRID_SIZE}px;
-        height: ${props.board.size * GRID_SIZE}px;
+        width: ${props.size.width * GRID_SIZE}px;
+        height: ${props.size.height * GRID_SIZE}px;
     `
     return <div style={style} class="board-view" id="board">{intersections}</div>
   }

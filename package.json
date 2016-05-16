@@ -47,6 +47,7 @@
     "babel-preset-react-hmre": "^1.0.0",
     "babel-runtime": "^6.6.1",
     "chai": "*",
+    "chai-immutable": "^1.5.4",
     "cross-env": "^1.0.6",
     "eslint": "^1.10.3",
     "eslint-plugin-babel": "^3.0.0",
@@ -63,6 +64,8 @@
   },
   "dependencies": {
     "deku": "2.0.0-rc16",
+    "guid": "0.0.12",
+    "immutable": "^3.8.1",
     "redux": "^3.4.0"
   }
 }
