@@ -2,20 +2,15 @@
 const {element} = require('deku')
 const {getBoardSize} = require('../selectors/BoardSelector')
 const {forEachPlayer} = require('../selectors/PlayerSelector')
-const BoardView = require('./BoardView')
-
-let handleClick = (x,y) => {
-  console.log(x,y)
-}
+const {MessageLogContainer} = require('messagelog')
 
 module.exports = {
   render({context}) {
-    const size = getBoardSize(context)
-    forEachPlayer(context, (player) => console.log(player))
+
+    const messages = [{text: 'test message 1'}, {text: 'test message 2'}]
+
     return (
-        <div>
-          <BoardView size={size} onClick={handleClick}></BoardView>
-        </div>
+      <MessageLogContainer messages={messages} onSend="(msg)=>{console.log(msg)}"></MessageLogContainer>
     )
   }
 }

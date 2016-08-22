@@ -1,0 +1,20 @@
+.message-log-container {
+  height: 100%;
+  display:grid;
+  grid-template-columns: 1fr 100px;
+  grid-template-rows: 1fr 25px;
+  grid-template-areas: "list  list"
+                       "input send";
+}
+
+.message-log-container-list {
+  grid-area: list;
+}
+
+.message-log-container-input {
+  grid-area: input;
+}
+
+.message-log-container-send {
+  grid-area: send;
+}

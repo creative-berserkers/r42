@@ -3,7 +3,21 @@
   <head>
     <title>Testing Hot reload</title>
     <style>
-
+      html {
+        min-height:100%;/* make sure it is at least as tall as the viewport */
+        position:relative;
+      }
+      body {
+        height:100%; /* force the BODY element to match the height of the HTML element */
+      }
+      #mount {
+        position:absolute;
+        top:0;
+        bottom:0;
+        left:0;
+        right:0;
+        overflow:hidden;
+      }
     </style>
   </head>
   <body style="background-color: cornflowerblue;font-family: monospace;">

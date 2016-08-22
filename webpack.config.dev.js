@@ -13,6 +13,9 @@ module.exports = {
     filename: 'bundle.js',
     publicPath: '/static/'
   },
+  resolve:{
+    modulesDirectories: ['node_modules', 'src']
+  },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin()
@@ -26,6 +29,8 @@ module.exports = {
         presets: ['es2015'],
         plugins: [['transform-react-jsx', {pragma: 'element'}]]
       }
-    }]
+    },
+    { test: /\.css$/, loader: "style-loader!css-loader"}
+  ]
   }
 };

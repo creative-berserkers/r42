@@ -49,6 +49,7 @@
     "chai": "*",
     "chai-immutable": "^1.5.4",
     "cross-env": "^1.0.6",
+    "css-loader": "^0.23.1",
     "eslint": "^1.10.3",
     "eslint-plugin-babel": "^3.0.0",
     "eslint-plugin-deku": "3.1.2",
@@ -58,6 +59,7 @@
     "mocha": "*",
     "nodemon": "^1.9.1",
     "rimraf": "^2.4.3",
+    "style-loader": "^0.13.1",
     "webpack": "1.13.0",
     "webpack-dev-middleware": "^1.5.1",
     "webpack-hot-middleware": "^2.10.0"

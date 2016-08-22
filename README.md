@@ -18,8 +18,8 @@ goblins-attacked-village:
 
   - "Goblins attacked village"
   - "What do you do?"
-  - "(0)Help villagers fight Goblins"
-  - "(1)Use situation to rob village"
+  - "(0)(30% + attack) Help villagers fight Goblins"
+  - "(1)(20%) Use situation to rob village"
   - "(2)Do nothing"
 
   Based on the player choice different things can happen at random. For example if player selects (1):
