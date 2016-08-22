@@ -4,7 +4,6 @@ const webpack = require('webpack'),
   WebSocketServer = require('ws').Server,
   config = require('./webpack.config.dev'),
   dev = require('webpack-dev-middleware'),
-  hot = require('webpack-hot-middleware'),
   express = require('express'),
   path = require('path'),
   http = require('http'),
@@ -16,7 +15,6 @@ const compiler = webpack(config)
 const app = express()
 
 app.use(dev(compiler, {noInfo: true, publicPath: config.output.publicPath}))
-app.use(hot(compiler))
 app.use('/static', express.static('public'));
 
 app.get('/testrom', function(req, res){

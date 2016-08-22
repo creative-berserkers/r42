@@ -4,9 +4,7 @@ var webpack = require('webpack')
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
   entry: [
-    'eventsource-polyfill', // necessary for hot reloading with IE
-    'webpack-hot-middleware/client',
-    './src/components/index'
+    './src/index'
   ],
   output: {
     path: path.join(__dirname, 'dist'),
@@ -16,18 +14,17 @@ module.exports = {
   resolve:{
     modulesDirectories: ['node_modules', 'src']
   },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
-  ],
+  plugins: [],
   module: {
     loaders: [{
       test: /\.js$/,
       loader: 'babel',
       include: path.join(__dirname, 'src'),
       query: {
-        presets: ['es2015'],
-        plugins: [['transform-react-jsx', {pragma: 'element'}]]
+        presets: [['es2015', {
+          "modules": false
+        }]],
+        plugins: ['transform-object-rest-spread','transform-react-jsx']
       }
     },
     { test: /\.css$/, loader: "style-loader!css-loader"}
