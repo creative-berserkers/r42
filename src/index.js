@@ -1,10 +1,10 @@
-import React from 'react'
-import { render } from 'react-dom'
-
-import {MessageLogContainer} from './messagelog/index'
-import { Provider } from 'react-redux'
-import {createStore } from 'redux'
+/* global React, ReactDOM, ReactRedux */
+import {createStore} from 'redux'
+import MessageLogContainer from './messagelog'
 import {GameReducer} from './GameReducer'
+
+
+const Provider = ReactRedux.Provider
 
 const store = createStore(GameReducer)
 
@@ -17,6 +17,6 @@ socket.onmessage = (event)=>{
 }*/
 const messages = [{text: 'test message 1'}, {text: 'test message 2'}]
 
-render(<Provider store={store} >
+ReactDOM.render(
         <MessageLogContainer messages={messages} onSend="(msg)=>{console.log(msg)}"></MessageLogContainer>
-    </Provider>,document.getElementById('mount'));
+    ,document.getElementById('mount'))

@@ -1,11 +1,7 @@
-'use strict'
+import {createStore, applyMiddleware} from 'redux'
+import guid from 'utils'
 
-const Redux = require('redux')
-const Guid = require('guid')
-
-const {createStore, applyMiddleware} = Redux
-
-module.exports = function createGame(){
+export default function createGame(){
 
   let clients = []
 
@@ -24,7 +20,7 @@ module.exports = function createGame(){
   let clientConnected = (ws)=>{
     const client = {
       ws,
-      guid : Guid.raw()
+      guid : guid()
     }
 
     ws.on('close', () => {

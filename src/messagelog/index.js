@@ -1,6 +1,4 @@
-require('./style.css')
-const MessageLogContainer = require('./MessageLogContainer')
 
-module.exports = {
-  MessageLogContainer
-}
+import MessageLogContainer from './MessageLogContainer'
+
+export default MessageLogContainer
