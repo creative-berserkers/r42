@@ -20,7 +20,6 @@ export default {
     }),
     includePaths(includePathOptions),
     localResolve(),
-    jsx( {factory: 'React.createElement'} ),
     nodeResolve({
       jsnext: true,
       main: true

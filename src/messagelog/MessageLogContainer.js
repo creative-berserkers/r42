@@ -1,10 +1,14 @@
+import css from 'style.css'
+
 const MessageLogContainer = ({messages}) => {
-    <div class='message-log-container'>
-        <div class='message-log-container-list'>
-          { messages.map((message)=>{ return <div>{message.text}</div> }) }
+
+    //return <h1>Hello World</h1>
+    return <div className={css.messageLogContainer}>
+        <div key="list" className={css.messageLogContainerList}>
+          { messages.map((message)=>{ return <div key={message.id}>{message.text}</div> }) }
         </div>
-        <input class='message-log-container-input' onChange={()=>{}}></input>
-        <button class='message-log-container-send' onClick={()=>{}} >Send</button>
+        <input key="input" className={css.messageLogContainerInput} onChange={()=>{}}></input>
+        <button key="send" className={css.messageLogContainerSend} onClick={()=>{}} >Send</button>
     </div>
 }
 

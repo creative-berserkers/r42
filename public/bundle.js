@@ -431,13 +431,22 @@ if ("development" !== 'production' && typeof isCrushed.name === 'string' && isCr
   warning('You are currently using minified code outside of NODE_ENV === \'production\'. ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or DefinePlugin for webpack (http://stackoverflow.com/questions/30030031) ' + 'to ensure you have the correct code for your production build.');
 }
 
+var css = {
+    "messageLogContainer": "mcad618bde_messageLogContainer",
+    "messageLogContainerList": "mcad618bde_messageLogContainerList",
+    "messageLogContainerInput": "mcad618bde_messageLogContainerInput",
+    "messageLogContainerSend": "mcad618bde_messageLogContainerSend"
+};
+
 const MessageLogContainer = ({messages}) => {
-    React.createElement('div', {class: "message-log-container"}, [
-        React.createElement('div', {class: "message-log-container-list"}, [
-           messages.map((message)=>{ return React.createElement('div', null, [message.text]) })
+
+    //return <h1>Hello World</h1>
+    return React.createElement('div', {className: css.messageLogContainer}, [
+        React.createElement('div', {key: "list", className: css.messageLogContainerList}, [
+           messages.map((message)=>{ return React.createElement('div', {key: message.id}, [message.text]) })
         ]),
-        React.createElement('input', {class: "message-log-container-input", onChange: ()=>{}}),
-        React.createElement('button', {class: "message-log-container-send", onClick: ()=>{}}, ["Send"])
+        React.createElement('input', {key: "input", className: css.messageLogContainerInput, onChange: ()=>{}}),
+        React.createElement('button', {key: "send", className: css.messageLogContainerSend, onClick: ()=>{}}, ["Send"])
     ])
 }
 
@@ -469,7 +478,7 @@ socket.onmessage = (event)=>{
   store.dispatch(JSON.parse(event.data))
   console.log(store.getState().toJS())
 }*/
-const messages = [{text: 'test message 1'}, {text: 'test message 2'}]
+const messages = [{id:"1",text: 'test message 1'}, {id:"2",text: 'test message 2'}]
 
 ReactDOM.render(
         MessageLogContainer({messages: messages, onSend: "(msg)=>{console.log(msg)}"})

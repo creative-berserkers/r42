@@ -15,7 +15,7 @@ socket.onmessage = (event)=>{
   store.dispatch(JSON.parse(event.data))
   console.log(store.getState().toJS())
 }*/
-const messages = [{text: 'test message 1'}, {text: 'test message 2'}]
+const messages = [{id:"1",text: 'test message 1'}, {id:"2",text: 'test message 2'}]
 
 ReactDOM.render(
         <MessageLogContainer messages={messages} onSend="(msg)=>{console.log(msg)}"></MessageLogContainer>

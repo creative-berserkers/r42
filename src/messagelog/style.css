@@ -1,4 +1,4 @@
-.message-log-container {
+.messageLogContainer {
   height: 100%;
   display:grid;
   grid-template-columns: 1fr 100px;
@@ -7,14 +7,14 @@
                        "input send";
 }
 
-.message-log-container-list {
+.messageLogContainerList {
   grid-area: list;
 }
 
-.message-log-container-input {
+.messageLogContainerInput {
   grid-area: input;
 }
 
-.message-log-container-send {
+.messageLogContainerSend {
   grid-area: send;
 }

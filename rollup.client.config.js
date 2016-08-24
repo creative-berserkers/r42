@@ -1,9 +1,10 @@
 import jsx from 'rollup-plugin-jsx'
-import commonjs from 'rollup-plugin-commonjs';
-import nodeResolve from 'rollup-plugin-node-resolve';
-import includePaths from 'rollup-plugin-includepaths';
-import localResolve from 'rollup-plugin-local-resolve';
-import replace from 'rollup-plugin-replace';
+import commonjs from 'rollup-plugin-commonjs'
+import nodeResolve from 'rollup-plugin-node-resolve'
+import includePaths from 'rollup-plugin-includepaths'
+import localResolve from 'rollup-plugin-local-resolve'
+import replace from 'rollup-plugin-replace'
+import modular from 'modular-css/rollup'
 
 let includePathOptions = {
     include: {},
@@ -15,6 +16,9 @@ let includePathOptions = {
 export default {
   entry: 'src/index.js',
   plugins: [
+    modular({
+      css : "public/bundle.css"
+    }),
     replace({
       'process.env.NODE_ENV': JSON.stringify( 'development' )
     }),
