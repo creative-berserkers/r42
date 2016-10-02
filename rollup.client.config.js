@@ -1,4 +1,4 @@
-import jsx from 'rollup-plugin-jsx'
+import babel from 'rollup-plugin-babel'
 import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import includePaths from 'rollup-plugin-includepaths'
@@ -14,17 +14,19 @@ let includePathOptions = {
 };
 
 export default {
-  entry: 'src/index.js',
+  entry: 'src/main/index.js',
   plugins: [
     modular({
       css : "public/bundle.css"
+    }),
+    babel({
+      exclude: 'node_modules/**'
     }),
     replace({
       'process.env.NODE_ENV': JSON.stringify( 'development' )
     }),
     includePaths(includePathOptions),
     localResolve(),
-    jsx( {factory: 'React.createElement'} ),
     nodeResolve({
       jsnext: true,
       main: true
@@ -35,6 +37,6 @@ export default {
       sourceMap: false
     })*/
   ],
-  sourceMap: true,
+  sourceMap: false,
   dest: 'public/bundle.js'
 };

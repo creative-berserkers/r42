@@ -1,0 +1,25 @@
+.mainContainer {
+  height: 100%;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 4fr 1fr 2fr;
+  grid-template-areas:  "chat  map"
+                        "dicepool dicepool "
+                        "action action";
+}
+
+.chat {
+  grid-area: chat;
+}
+
+.map {
+  grid-area: map;
+}
+
+.dicepool {
+  grid-area: dicepool;
+}
+
+.action {
+  grid-area: action;
+}

@@ -5,12 +5,11 @@
   "scripts": {
     "clean": "rimraf dist",
     "build:webpack": "cross-env NODE_ENV=production webpack --config webpack.config.prod.js",
-    "build-client": "node_modules/.bin/rollup -c rollup.client.config.js",
-    "build-server": "node_modules/.bin/rollup -c rollup.server.config.js",
-    "build-all": "npm run build-client & npm run build-server",
-    "build-and-run": "npm run build-all & node devServer.bundle.js",
-    "watch": "node_modules/.bin/nodemon --watch src --exec \"npm run build-client & npm run build-server & node devServer.bundle.js\"",
-    "start": "node devServer.js",
+    "build:client": "node_modules/.bin/rollup -c rollup.client.config.js",
+    "build:server": "node_modules/.bin/rollup -c rollup.server.config.js",
+    "build:all": "npm run build:client & npm run build:server",
+    "watch": "npm run build:server & node devServer.bundle.js & node_modules/.bin/nodemon --watch src -e js,css --exec \"npm run build:client\"",
+    "start": "npm run build:all & node devServer.bundle.js",
     "debug": "node-debug devServer.js",
     "lint": "eslint src",
     "test": "mocha  --compilers js:babel-core/register --recursive --reporter spec src",
@@ -40,6 +39,7 @@
   },
   "homepage": "https://github.com/gaearon/react-transform-boilerplate",
   "devDependencies": {
+    "babel-preset-react": "^6.11.1",
     "chai": "*",
     "eslint": "^3.3.1",
     "eslint-plugin-babel": "^3.0.0",
@@ -50,6 +50,7 @@
     "nodemon": "^1.10.2",
     "rimraf": "^2.4.3",
     "rollup": "^0.34.10",
+    "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-commonjs": "^3.3.1",
     "rollup-plugin-includepaths": "^0.1.5",
     "rollup-plugin-jsx": "^1.0.3",
@@ -59,7 +60,7 @@
     "rollup-plugin-root-import": "^0.2.0"
   },
   "dependencies": {
-    "redux": "^3.5.2",
+    "redux": "3.6.0",
     "ws": "^1.1.1"
   }
 }

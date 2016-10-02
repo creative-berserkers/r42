@@ -1,3 +1,4 @@
-import guid from './guid.js'
+import guid from './guid'
+import randomInt from './randomInt'
 
-export default { guid }
+export { guid , randomInt }

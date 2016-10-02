@@ -1,5 +1,5 @@
 import {createStore, applyMiddleware} from 'redux'
-import guid from 'utils'
+import {guid} from 'utils'
 
 export default function createGame(){
 
