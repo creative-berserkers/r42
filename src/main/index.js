@@ -2,13 +2,12 @@
 import css from 'style.css'
 import {createStore, combineReducers} from 'redux'
 import AppContainer from './AppContainer'
-import diceReducer from './dice/dice.duck'
-import {randomInt} from './utils'
+import diceReducer from './model/roll.duck'
 
 const Provider = ReactRedux.Provider
 
 const rootReducer = combineReducers({
-  dice : diceReducer
+  rolls : diceReducer
 })
 const store = createStore(rootReducer)
 

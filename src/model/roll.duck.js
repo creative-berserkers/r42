@@ -7,15 +7,9 @@ export function reroll(numbers){
   }
 }
 
-const initialState = {
-  numbers : []
-}
-
-export default function reducer(state=initialState, action={}){
+export default function reducer(state=[1,2,3,4,5,6], action={}){
   switch(action.type){
-    case REROLL : return {
-      numbers : [...action.numbers]
-    }
+    case REROLL : return [...action.numbers]
     default : return state
   }
 }

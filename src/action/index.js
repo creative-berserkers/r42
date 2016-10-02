@@ -1,3 +1,3 @@
-import ActionContainer from 'DiceContainer'
+import ActionContainer from 'ActionContainer'
 
 export default ActionContainer
