@@ -1,0 +1,11 @@
+.actionPoolComponent {
+  display: flex;
+  align-items: center;
+}
+
+.actionComponent {
+  width: 12.5%;
+  height: 80%;
+  margin: 10px;
+  background-color: grey;
+}

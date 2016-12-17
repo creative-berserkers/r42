@@ -8,19 +8,19 @@ import modular from 'modular-css/rollup'
 
 let includePathOptions = {
     include: {},
-    paths: ['src'],
+    paths: ['src', 'lib'],
     external: [],
     extensions: ['.js']
 };
 
 export default {
-  entry: 'src/main/index.js',
+  entry: 'src/index.js',
   plugins: [
     modular({
       css : "public/bundle.css"
     }),
     babel({
-      exclude: 'node_modules/**'
+      exclude: 'node_modules/**',
     }),
     replace({
       'process.env.NODE_ENV': JSON.stringify( 'development' )

@@ -1,0 +1,16 @@
+.dicePoolComponent {
+  background-color: orange;
+  display: flex;
+  align-items: center;
+}
+
+.dice {
+  font-size: 4em;
+  width: 64px;
+  height: 64px;
+  margin: 10px;
+}
+
+.diceLocked {
+  border: 2px solid black;
+}
