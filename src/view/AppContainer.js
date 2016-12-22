@@ -1,4 +1,5 @@
 import css from './style.css'
+import * as React from 'react'
 
 import MessageLogContainer from './messagelog'
 

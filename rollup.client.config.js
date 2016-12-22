@@ -14,6 +14,7 @@ let includePathOptions = {
 
 export default {
   entry: 'src/client/index.js',
+  format: 'iife',
   plugins: [
     modular({
       css : "public/bundle.css"
@@ -37,5 +38,17 @@ export default {
     })*/
   ],
   sourceMap: false,
-  dest: 'public/bundle.js'
+  dest: 'public/bundle.js',
+  external: [
+      'react-dom',
+      'react',
+      'react-redux',
+      'redux'
+  ],
+  globals: {
+      react: 'React',
+      'react-redux':'ReactRedux',
+      'react-dom':'ReactDOM',
+      'redux': 'Redux'
+  }
 };

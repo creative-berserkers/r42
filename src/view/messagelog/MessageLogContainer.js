@@ -1,9 +1,11 @@
 import css from './style.css'
+import * as React from 'react'
+import {connect} from 'react-redux'
 
 class MessageLogContainer extends React.Component {
 
   constructor() {
-    super();
+    super()
   }
 
   static propTypes(){
@@ -26,7 +28,7 @@ class MessageLogContainer extends React.Component {
 
     let handleClick = ()=>{
       this.props.onSend(this.refs.chatInput.value)
-      this.refs.chatInput.value = ""
+      this.refs.chatInput.value = ''
     }
 
     let handleKeyboard = (e)=>{
@@ -45,7 +47,7 @@ class MessageLogContainer extends React.Component {
   }
 }
 
-const mapDispatchToProps = function(dispatch, ownProps) {
+const mapDispatchToProps = function(dispatch) {
   return {
     onSend: function(command) {
       dispatch({type: 'COMMAND_REQUEST', command: command})
@@ -56,7 +58,7 @@ const mapDispatchToProps = function(dispatch, ownProps) {
 const mapStateToProps = function(store) {
   return {
     messages: store.messages
-  };
+  }
 }
 
-export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(MessageLogContainer)
+export default connect(mapStateToProps, mapDispatchToProps)(MessageLogContainer)
