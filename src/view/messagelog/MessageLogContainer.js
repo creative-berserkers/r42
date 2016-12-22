@@ -1,4 +1,4 @@
-import css from 'style.css'
+import css from './style.css'
 
 class MessageLogContainer extends React.Component {
 
@@ -25,7 +25,7 @@ class MessageLogContainer extends React.Component {
     const messages = this.props.messages
 
     let handleClick = ()=>{
-      console.log(this.refs.chatInput.value)
+      this.props.onSend(this.refs.chatInput.value)
       this.refs.chatInput.value = ""
     }
 
@@ -34,7 +34,7 @@ class MessageLogContainer extends React.Component {
         handleClick()
       }
     }
-    //return <h1>Hello World</h1>
+
     return <div className={`${this.props.className} ${css.messageLogContainer}`}>
         <div key="list" className={css.messageLogContainerList}>
           { messages.map((message)=>{ return <div key={message.id}>{message.text}</div> }) }
@@ -45,4 +45,18 @@ class MessageLogContainer extends React.Component {
   }
 }
 
-export default MessageLogContainer
+const mapDispatchToProps = function(dispatch, ownProps) {
+  return {
+    onSend: function(command) {
+      dispatch({type: 'COMMAND_REQUEST', command: command})
+    }
+  }
+}
+
+const mapStateToProps = function(store) {
+  return {
+    messages: store.messages
+  };
+}
+
+export default ReactRedux.connect(mapStateToProps, mapDispatchToProps)(MessageLogContainer)

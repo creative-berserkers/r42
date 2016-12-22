@@ -3,6 +3,7 @@ node_modules
 .idea
 npm-debug.log
 out
+lib
 public/bundle.css
 public/bundle.js
 public/bundle.js.map

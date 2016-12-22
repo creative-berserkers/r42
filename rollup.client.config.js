@@ -1,5 +1,4 @@
 import babel from 'rollup-plugin-babel'
-import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import includePaths from 'rollup-plugin-includepaths'
 import localResolve from 'rollup-plugin-local-resolve'
@@ -8,13 +7,13 @@ import modular from 'modular-css/rollup'
 
 let includePathOptions = {
     include: {},
-    paths: ['src', 'lib'],
+    paths: ['src'],
     external: [],
     extensions: ['.js']
 };
 
 export default {
-  entry: 'src/index.js',
+  entry: 'src/client/index.js',
   plugins: [
     modular({
       css : "public/bundle.css"
