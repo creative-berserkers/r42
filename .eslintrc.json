@@ -5,6 +5,9 @@
         "es6": true,
         "node": true
     },
+    "globals": {
+        "io": true
+    },
     "extends": "eslint:recommended",
     "parserOptions": {
         "ecmaFeatures": {
@@ -19,7 +22,8 @@
     "rules": {
         "indent": [
             "error",
-            2
+            2,
+            { "SwitchCase": 1 }
         ],
         "linebreak-style": [
             "error",

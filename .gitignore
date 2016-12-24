@@ -4,6 +4,7 @@ node_modules
 npm-debug.log
 out
 lib
+data
 public/bundle.css
 public/bundle.js
 public/bundle.js.map

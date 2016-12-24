@@ -7,8 +7,9 @@
     "build:webpack": "cross-env NODE_ENV=production webpack --config webpack.config.prod.js",
     "build:client": "node_modules/.bin/rollup -c rollup.client.config.js",
     "build:server": "node_modules/.bin/rollup -c rollup.server.config.js",
-    "build:all": "npm run build:client & npm run build:server",
-    "watch": "npm run build:server & node devServer.bundle.js & node_modules/.bin/nodemon --watch src -e js,css --exec \"npm run build:client\"",
+    "build:all": "npm run build:client && npm run build:server",
+    "watch:client": "node_modules/.bin/nodemon --watch src -e js,css --exec \"npm run build:client\"",
+    "watch:server": "node_modules/.bin/nodemon --watch src/server --watch src/model -e js --exec \"npm run build:server && node server.bundle.js \"",
     "start": "npm run build:all & node devServer.bundle.js",
     "debug": "node-debug devServer.js",
     "lint": "eslint src",
@@ -74,6 +75,7 @@
     "react-redux": "^5.0.1",
     "redux": "3.6.0",
     "socket.io": "^1.7.2",
+    "winston": "^2.3.0",
     "ws": "^1.1.1"
   }
 }
