@@ -21,8 +21,9 @@ export default function command({ getState, dispatch }) {
 
   return (next) => (action) => {
     if(action.type === 'COMMAND_REQUEST'){
-      log.info(`will dispatch: ${action}`)
-      socket.emit('command_request', JSON.stringify(action))
+      const actionJSON = JSON.stringify(action)
+      log.info(`will dispatch: ${actionJSON}`)
+      socket.emit('command_request', action)
       return {}
     } else {
       return next(action)
