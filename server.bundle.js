@@ -47,7 +47,7 @@ function contextReducer(state = initialState$1, action) {
   }
 }
 
-function changed(oldState, newState) {
+function shallowEqual(oldState, newState) {
   const resultOldToNew = Object.keys(oldState).reduce((result, oldKey) => {
     return result === true ? result : oldState[oldKey] !== newState[oldKey];
   }, false);
@@ -56,7 +56,12 @@ function changed(oldState, newState) {
     return result === true ? result : oldState[newKey] !== newState[newKey];
   }, false);
 
-  return resultNewToOld || resultOldToNew ? newState : oldState;
+  return !resultNewToOld && !resultOldToNew;
+}
+
+function changed(oldState, newState) {
+
+  return shallowEqual(oldState, newState) ? oldState : newState;
 }
 
 const initialState = {
@@ -141,49 +146,60 @@ store.subscribe(function persistState() {
   });
 });
 
-const clientGUIDs = {};
+const clientSocketIdToGuid = {};
+const clientGuidToSocket = {};
 
-function onSocket(socket) {
+function onSocket(io, socket) {
   const ipAddress = socket.request.connection.remoteAddress;
   const clientId = `${ ipAddress }`;
   log.info(`client ??@${ clientId } connected`);
 
   socket.on('authentication', function (authToken) {
-    clientGUIDs[socket.id] = authToken;
+    clientSocketIdToGuid[socket.id] = authToken;
+    clientGuidToSocket[authToken] = socket;
     log.info(`client ??@${ clientId } authenticated as ${ authToken }`);
     store.dispatch({
       type: 'CONTEXT_SPAWNED',
-      id: clientGUIDs[socket.id]
+      id: clientSocketIdToGuid[socket.id]
     });
+    socket.send('initial_state', store.getState().contexts[authToken].shared);
   });
 
   socket.on('disconnect', function () {
-    log.info(`client ${ clientGUIDs[socket.id] }@${ clientId } disconnected`);
+    log.info(`client ${ clientSocketIdToGuid[socket.id] }@${ clientId } disconnected`);
     store.dispatch({
       type: 'CONTEXT_DESPAWNED',
-      id: clientGUIDs[socket.id]
+      id: clientSocketIdToGuid[socket.id]
     });
-    clientGUIDs[socket.id] = undefined;
+    clientGuidToSocket[clientSocketIdToGuid[socket.id]] = undefined;
+    clientSocketIdToGuid[socket.id] = undefined;
   });
 
   socket.on('command_request', function (action) {
     if (action.type !== 'COMMAND_REQUEST') return;
-    log.info(`client ${ clientGUIDs[socket.id] }@${ clientId } command:${ JSON.stringify(action.command) }`);
-    //const stateBeforeRequest = store.getState()
+    log.info(`client ${ clientSocketIdToGuid[socket.id] }@${ clientId } command:${ JSON.stringify(action.command) }`);
+
     chatActionHandler(store.getState(), {
       type: action.type,
       command: action.command,
-      id: clientGUIDs[socket.id]
+      id: clientSocketIdToGuid[socket.id]
     }, action => {
       log.info(`dispatching ${ JSON.stringify(action) }`);
+      const stateBeforeRequest = store.getState();
       store.dispatch(action);
+      const stateAfterRequest = store.getState();
+      Object.keys(stateBeforeRequest.contexts).forEach(key => {
+
+        const stateChanged = !shallowEqual(stateBeforeRequest.contexts[key].shared, stateAfterRequest.contexts[key].shared);
+        const targetSocket = clientGuidToSocket[key];
+        if (stateChanged) {
+          log.info(`After ${ action.type } state for ${ key } changed, sending action`);
+          targetSocket.send('action', action);
+        } else {
+          log.info(`After ${ action.type } state for ${ key } is same`);
+        }
+      });
     });
-    /*const stateAfterRequest = store.getState()
-    stateAfterRequest.contexts.keys().forEach((key) => {
-      if(stateAfterRequest.contexts[key] !== stateBeforeRequest.contexts[key]){
-        log.info(`sending action back to client ${key}`)
-      }
-    })*/
   });
 }
 
@@ -198,7 +214,7 @@ app.get('*', function (req, res) {
 const server = http.createServer(app);
 const io = socketIO(server);
 
-io.on('connection', onSocket);
+io.on('connection', onSocket.bind(undefined, io));
 
 server.listen(3000, 'localhost', function (err) {
   if (err) log.error(err);else {

@@ -17,7 +17,7 @@ app.get('*', function(req, res) {
 const server = http.createServer(app)
 const io = socketIO(server)
 
-io.on('connection', serverIO)
+io.on('connection', serverIO.bind(undefined, io))
 
 server.listen(3000, 'localhost', function(err) {
   if (err) log.error(err)

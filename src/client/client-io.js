@@ -10,12 +10,20 @@ export default function command({ getState, dispatch }) {
     localStorage.setItem('auth-token', authToken)
   }
 
-  socket.on('connect', function(){
+  socket.on('connect', function onConnect(){
     log.info('connected')
     socket.emit('authentication', authToken)
   })
 
-  socket.on('action', function(action){
+  socket.on('initial_state', function onInitialState(state){
+    log.info('initial_state', state)
+    dispatch({
+      type: 'LOAD_CLIENT_STATE',
+      state: state
+    })
+  })
+
+  socket.on('action', function onAction(action){
     dispatch(action)
   })
 

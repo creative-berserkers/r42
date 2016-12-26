@@ -13,8 +13,7 @@
     "start": "npm run build:all & node devServer.bundle.js",
     "debug": "node-debug devServer.js",
     "lint": "eslint src",
-    "test": "mocha  --compilers js:babel-core/register --recursive --reporter spec src",
-    "test-cpu": "mocha -w --compilers js:babel-core/register test/gbc/CPUTest"
+    "test": "find ./src -name '*.spec.js' | xargs mocha  --compilers js:babel-core/register --require babelhook --reporter spec"
   },
   "repository": {
     "type": "git",
